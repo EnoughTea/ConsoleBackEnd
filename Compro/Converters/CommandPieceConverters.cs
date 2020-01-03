@@ -6,9 +6,6 @@ namespace Compro
 {
     public class CommandPieceConverters
     {
-        private static readonly ConvertibleCommandPieceConverter _ConvertibleConverter =
-            new ConvertibleCommandPieceConverter();
-
         private static readonly JsonCommandPieceConverter _JsonConverter =
             new JsonCommandPieceConverter();
 
@@ -42,9 +39,6 @@ namespace Compro
             return converter;
         }
 
-        public static ICommandPieceConverter GetDefaultConverter(Type targetType) =>
-            targetType.GetInterfaces().Contains(typeof(IConvertible))
-                ? (ICommandPieceConverter) _ConvertibleConverter
-                : _JsonConverter;
+        public static ICommandPieceConverter GetDefaultConverter(Type targetType) => _JsonConverter;
     }
 }
