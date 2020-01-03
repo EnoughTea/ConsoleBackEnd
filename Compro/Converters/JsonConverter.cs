@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Compro
 {
-    public class JsonCommandPieceConverter : ICommandPieceConverter
+    public class JsonConverter : ICommandIOPartConverter
     {
         private static readonly JsonSerializerSettings _DefaultSettings = new JsonSerializerSettings {
             Culture = CultureInfo.InvariantCulture,
@@ -18,9 +18,9 @@ namespace Compro
 
         public JsonSerializerSettings Settings { get; }
 
-        public JsonCommandPieceConverter() => Settings = _DefaultSettings;
+        public JsonConverter() => Settings = _DefaultSettings;
 
-        public JsonCommandPieceConverter(JsonSerializerSettings settings) =>
+        public JsonConverter(JsonSerializerSettings settings) =>
             Settings = settings ?? throw new ArgumentNullException(nameof(settings));
 
         public Try<object> ConvertFromString(string repr, Type targetType)

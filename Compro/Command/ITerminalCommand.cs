@@ -14,6 +14,6 @@ namespace Compro
 
         CommandReturnInfo Result { get; }
 
-        CommandCallResult Call(params string[] args);
+        ICommandCallResult Call(params string[] args);
     }
 }

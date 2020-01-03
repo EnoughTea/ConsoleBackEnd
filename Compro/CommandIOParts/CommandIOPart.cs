@@ -9,10 +9,10 @@ namespace Compro {
 
         public Type Type { get; }
 
-        public ICommandPieceConverter Converter { get; }
+        public ICommandIOPartConverter Converter { get; }
 
         protected CommandIOPart(Type type,
-                                ICommandPieceConverter converter,
+                                ICommandIOPartConverter converter,
                                 string name = "",
                                 string description = "")
         {

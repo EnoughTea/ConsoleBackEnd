@@ -8,12 +8,12 @@ namespace Compro.Tests
 {
     public class JsonCommandPieceConverterTests
     {
-        private JsonCommandPieceConverter _defaultConverter;
+        private JsonConverter _defaultConverter;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _defaultConverter = new JsonCommandPieceConverter();
+            _defaultConverter = new JsonConverter();
             var arr = ArrayPool<object>.Shared.Rent(10);
             ArrayPool<object>.Shared.Return(arr, true);
         }

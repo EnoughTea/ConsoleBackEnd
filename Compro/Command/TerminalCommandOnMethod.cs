@@ -13,15 +13,19 @@ namespace Compro
 
         public MethodInfo ExecutedMethodInfo { get; }
 
-        public TerminalCommandOnMethod(object executedMethodInstance, MethodInfo executedMethodInfo)
+        public TerminalCommandOnMethod(object executedMethodInstance,
+                                       MethodInfo executedMethodInfo,
+                                       CommandIOPartConverters converters)
         {
+            if (converters == null) throw new ArgumentNullException(nameof(converters));
+
             ExecutedMethodInstance = executedMethodInstance ??
                 throw new ArgumentNullException(nameof(executedMethodInstance));
             ExecutedMethodInfo = executedMethodInfo ?? throw new ArgumentNullException(nameof(executedMethodInfo));
             Name = executedMethodInfo.Name;
             Description = executedMethodInfo.GetCustomAttribute<CommandExecutableAttribute>()?.Description ?? "";
-            Result = ExtractResult(executedMethodInfo);
-            Parameters = ExtractParameters(executedMethodInfo);
+            Result = ExtractResult(executedMethodInfo, converters);
+            Parameters = ExtractParameters(executedMethodInfo, converters);
         }
 
         public string Name { get; }
@@ -32,27 +36,26 @@ namespace Compro
 
         public string Description { get; }
 
-        public CommandCallResult Call(params string[] args)
+        public ICommandCallResult Call(params string[] args)
         {
             var result = from convertedArgs in CommandParameterInfo.ConvertArgs(Parameters, args)
                          from returned in Execute(convertedArgs)
-                         from returnedConverted in ConvertIfNotVoid(returned)
-                         select returnedConverted;
-            return result.Try().Match(returned =>
-                    Result.HasValue ? new CommandCallResult(returned) : CommandCallResult.Void,
-                e => new CommandCallResult(e));
+                         select returned;
+            return result.Try().Match<ICommandCallResult>(
+                returned => Result.HasValue
+                    ? new CommandCallSuccess(returned, Result.Converter)
+                    : CommandCallSuccess.Void,
+                e => new CommandCallFailure(e));
         }
 
-        private Try<string> ConvertIfNotVoid(object returned) =>
-            Result.HasValue ? Result.Converter.ConvertToString(returned) : () => "";
-
-        public static TerminalCommandOnMethod[] GatherFromInstance(object instance)
+        public static TerminalCommandOnMethod[] GatherFromInstance(object instance, CommandIOPartConverters converters)
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
+            if (converters == null) throw new ArgumentNullException(nameof(converters));
 
             var commandMethodInfos = instance.GetType().GetMethods().Where(methodInfo =>
                 methodInfo.GetCustomAttributes(typeof(CommandExecutableAttribute), false).Length > 0);
-            return commandMethodInfos.Select(cmi => new TerminalCommandOnMethod(instance, cmi))
+            return commandMethodInfos.Select(cmi => new TerminalCommandOnMethod(instance, cmi, converters))
                 .ToArray();
         }
 
@@ -68,18 +71,20 @@ namespace Compro
             return Try;
         }
 
-        private static IReadOnlyList<CommandParameterInfo> ExtractParameters(MethodInfo executedMethodInfo)
+        private static IReadOnlyList<CommandParameterInfo> ExtractParameters(MethodInfo executedMethodInfo,
+                                                                             CommandIOPartConverters converters)
         {
             var parameterInfos = executedMethodInfo.GetParameters();
             var commandParameters = new List<CommandParameterInfo>(parameterInfos.Length);
-            commandParameters.AddRange(from info in parameterInfos select ToCommandParameterInfo(info));
+            commandParameters.AddRange(from info in parameterInfos select ToCommandParameterInfo(info, converters));
             return commandParameters.AsReadOnly();
         }
 
-        private static CommandParameterInfo ToCommandParameterInfo(ParameterInfo parameterInfo)
+        private static CommandParameterInfo ToCommandParameterInfo(ParameterInfo parameterInfo,
+                                                                   CommandIOPartConverters converters)
         {
             var parameterDoc = parameterInfo.GetCustomAttribute<CommandDocAttribute>();
-            var converter = CommandPieceConverters.GetDefaultConverter(parameterInfo.ParameterType);
+            var converter = converters.Get(parameterInfo.ParameterType);
             var defaultInfo = parameterInfo.HasDefaultValue
                 ? new CommandParameterDefault(parameterInfo.DefaultValue)
                 : CommandParameterDefault.None;
@@ -87,12 +92,13 @@ namespace Compro
                 parameterInfo.Name, parameterDoc?.Description ?? "");
         }
 
-        private static CommandReturnInfo ExtractResult(MethodInfo executedMethodInfo)
+        private static CommandReturnInfo ExtractResult(MethodInfo executedMethodInfo,
+                                                       CommandIOPartConverters converters)
         {
             var returnDocAttribute = executedMethodInfo.ReturnTypeCustomAttributes
                 .GetCustomAttributes(typeof(CommandDocAttribute), false)
                 .FirstOrDefault() as CommandDocAttribute;
-            var converter = CommandPieceConverters.GetDefaultConverter(executedMethodInfo.ReturnType);
+            var converter = converters.Get(executedMethodInfo.ReturnType);
             return new CommandReturnInfo(executedMethodInfo.ReturnType, converter, "returns",
                 returnDocAttribute?.Description ?? "");
         }

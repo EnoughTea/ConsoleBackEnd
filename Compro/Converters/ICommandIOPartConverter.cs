@@ -3,7 +3,7 @@ using LanguageExt;
 
 namespace Compro
 {
-    public interface ICommandPieceConverter
+    public interface ICommandIOPartConverter
     {
         Try<object> ConvertFromString(string repr, Type targetType);
 

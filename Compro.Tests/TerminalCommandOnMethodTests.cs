@@ -8,46 +8,45 @@ namespace Compro.Tests
     public class TerminalCommandOnMethodTests
     {
         private TestCommandProvider _commandProvider;
+        private TerminalCommandOnMethod[] _commands;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _commandProvider = new TestCommandProvider();
+            _commands = TerminalCommandOnMethod.GatherFromInstance(_commandProvider, CommandIOPartConverters.Shared);
         }
 
         [Test]
         public void CommandsWithPrimitiveParametersShouldWorkOutOfTheBox()
         {
-            var commands = TerminalCommandOnMethod.GatherFromInstance(_commandProvider);
-            var sqrtCommand = commands.First(c => c.Name == "Sqrt");
+            var sqrtCommand = _commands.First(c => c.Name == "Sqrt");
 
             var result = sqrtCommand.Call("0.25");
 
-            Assert.AreEqual("0.5", result.ReturnedValue);
+            Assert.AreEqual("0.5", result.ConvertedValue);
         }
 
         [Test]
         public void CommandsWithComplexReturnShouldWorkOutOfTheBox()
         {
-            var commands = TerminalCommandOnMethod.GatherFromInstance(_commandProvider);
-            var findCommand = commands.First(c => c.Name == "Find");
+            var findCommand = _commands.First(c => c.Name == "Find");
 
             var result = findCommand.Call("Macron");
 
-            Assert.IsTrue(result.ReturnedValue?.Contains("Putin"), result.ReturnedValue);
-            Assert.IsTrue(result.HasValue);
+            Assert.IsTrue(result.ConvertedValue.Contains("Putin"), result.ConvertedValue);
+            Assert.AreNotEqual(CommandCallSuccess.Void, result);
         }
 
         [Test]
-        public void CommandsWitVoidReturnAndParamsShouldWorkOutOfTheBox()
+        public void CommandsWithVoidReturnAndParamsShouldWorkOutOfTheBox()
         {
-            var commands = TerminalCommandOnMethod.GatherFromInstance(_commandProvider);
-            var printCommand = commands.First(c => c.Name == "PrintLocalTime");
+            var printCommand = _commands.First(c => c.Name == "PrintLocalTime");
 
             var result = printCommand.Call();
 
-            Assert.AreEqual("", result.ReturnedValue);
-            Assert.IsFalse(result.HasValue);
+            Assert.AreEqual("", result.ConvertedValue);
+            Assert.AreEqual(CommandCallSuccess.Void, result);
         }
 
         internal class TestCommandProvider

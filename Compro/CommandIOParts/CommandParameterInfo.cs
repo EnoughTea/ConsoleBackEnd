@@ -11,7 +11,7 @@ namespace Compro
 
         public CommandParameterInfo(Type type,
                                     CommandParameterDefault defaultValue,
-                                    ICommandPieceConverter converter,
+                                    ICommandIOPartConverter converter,
                                     string name = "",
                                     string description = "")
             : base(type, converter, name, description) =>

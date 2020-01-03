@@ -9,6 +9,6 @@ namespace Compro {
 
         Type Type { get; }
 
-        ICommandPieceConverter Converter { get; }
+        ICommandIOPartConverter Converter { get; }
     }
 }
