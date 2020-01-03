@@ -7,6 +7,6 @@ namespace Compro
     {
         Try<object> ConvertFromString(string repr, Type targetType);
 
-        Try<string> ConvertToString(object value);
+        Try<string> ConvertToString<T>(T value);
     }
 }

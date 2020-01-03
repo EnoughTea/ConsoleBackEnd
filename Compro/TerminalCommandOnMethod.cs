@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using LanguageExt;
+using LanguageExt.Common;
 
 namespace Compro
 {
@@ -45,7 +46,7 @@ namespace Compro
         private Try<string> ConvertIfNotVoid(object returned) =>
             Result.HasValue ? Result.Converter.ConvertToString(returned) : () => "";
 
-        public static TerminalCommandOnMethod[] GatherFromInstance<T>(T instance)
+        public static TerminalCommandOnMethod[] GatherFromInstance(object instance)
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
 
@@ -55,8 +56,17 @@ namespace Compro
                 .ToArray();
         }
 
-        private Try<object> Execute(object[] convertedArgs) =>
-            () => ExecutedMethodInfo.Invoke(ExecutedMethodInstance, convertedArgs);
+        private Try<object> Execute(object[] convertedArgs)
+        {
+            Result<object> Try()
+            {
+                var result = ExecutedMethodInfo.Invoke(ExecutedMethodInstance, convertedArgs);
+                ArrayPools<object>.Return(convertedArgs);
+                return result;
+            }
+
+            return Try;
+        }
 
         private static IReadOnlyList<CommandParameterInfo> ExtractParameters(MethodInfo executedMethodInfo)
         {

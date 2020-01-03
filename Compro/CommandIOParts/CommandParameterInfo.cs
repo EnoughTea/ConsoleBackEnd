@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LanguageExt;
+using LanguageExt.Common;
 
 namespace Compro
 {
@@ -16,15 +17,17 @@ namespace Compro
             : base(type, converter, name, description) =>
             Default = defaultValue ?? throw new ArgumentNullException(nameof(defaultValue));
 
-        public static Try<object[]> ConvertArgs(IReadOnlyList<CommandParameterInfo> parameterInfos,
-                                                string[] args) =>
-            () => {
+        internal static Try<object[]> ConvertArgs(IReadOnlyList<CommandParameterInfo> parameterInfos,
+                                                string[] args)
+        {
+            Result<object[]> InnerTry()
+            {
                 if (args.Length > parameterInfos.Count) {
                     throw new ArgumentException($"Passed {args.Length} argument(s), but there are " +
                         $"${parameterInfos.Count} command parameters.");
                 }
 
-                var convertedArgs = new object[parameterInfos.Count];
+                var convertedArgs = ArrayPools<object>.Request(parameterInfos.Count);
                 for (int index = 0; index < parameterInfos.Count; index++) {
                     var currentParamInfo = parameterInfos[index];
                     if (args.Length > index) {
@@ -40,7 +43,10 @@ namespace Compro
                 }
 
                 return convertedArgs;
-            };
+            }
+
+            return InnerTry;
+        }
 
         private static void ConvertAndSetArg(ICommandIOPart currentParamInfo,
                                              string argRepr,
@@ -48,7 +54,11 @@ namespace Compro
                                              int index)
         {
             var conversionResult = currentParamInfo.Converter.ConvertFromString(argRepr, currentParamInfo.Type).Try();
-            conversionResult.Match(r => convertedArgs[index] = r, e => throw new ArgumentException(e.Message, e));
+            if (conversionResult.IsSuccess) {
+                convertedArgs[index] = conversionResult.IfFail(null);
+            } else {
+                conversionResult.IfFail(e => throw new ArgumentException(e.Message, e));
+            }
         }
     }
 }
