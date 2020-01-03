@@ -26,9 +26,18 @@ namespace Compro
             Settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        public Try<object> ConvertFromString(string repr, Type targetType) =>
-            () => JsonConvert.DeserializeObject(repr, targetType, Settings);
+        public Try<object> ConvertFromString(string repr, Type targetType)
+        {
+            return targetType == typeof(string)
+                ? (Try<object>) (() => repr)
+                : () => JsonConvert.DeserializeObject(repr, targetType, Settings);
+        }
 
-        public Try<string> ConvertToString(object value) => () => JsonConvert.SerializeObject(value, Settings);
+        public Try<string> ConvertToString(object value)
+        {
+            return value is string stringValue
+                ? (Try<string>) (() => stringValue)
+                : () => JsonConvert.SerializeObject(value, Settings);
+        }
     }
 }
