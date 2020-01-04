@@ -14,7 +14,7 @@ namespace Compro.Tests
         public void OneTimeSetUp()
         {
             _commandProvider = new TestCommandProvider();
-            _commands = ConsoleCommandOnMethod.GatherFromInstance(_commandProvider, CommandIOPartConverters.Shared);
+            _commands = ConsoleCommands.GatherFromInstance(_commandProvider);
         }
 
         [Test]
@@ -22,9 +22,10 @@ namespace Compro.Tests
         {
             var sqrtCommand = _commands.First(c => c.Name == "Sqrt");
 
-            var result = sqrtCommand.Call("0.25");
-
-            Assert.AreEqual("0.5", result.ConvertedValue);
+            var result = sqrtCommand.Execute("0.25");
+            var converted = result.ConvertOrError();
+            
+            Assert.AreEqual("0.5", converted);
         }
 
         [Test]
@@ -32,10 +33,11 @@ namespace Compro.Tests
         {
             var findCommand = _commands.First(c => c.Name == "Find");
 
-            var result = findCommand.Call("\"Macron\"");
+            var result = findCommand.Execute("\"Macron\"");
+            var converted = result.ConvertOrError();
 
-            Assert.IsTrue(result.ConvertedValue.Contains("Putin"), result.ConvertedValue);
-            Assert.AreNotEqual(CommandCallSuccess.Void, result);
+            Assert.AreNotEqual(CommandExecuteSuccess.Void, result);
+            Assert.IsTrue(converted.Contains("Putin"));
         }
 
         [Test]
@@ -43,10 +45,10 @@ namespace Compro.Tests
         {
             var printCommand = _commands.First(c => c.Name == "PrintLocalTime");
 
-            var result = printCommand.Call();
+            var result = printCommand.Execute();
 
-            Assert.AreEqual("", result.ConvertedValue);
-            Assert.AreEqual(CommandCallSuccess.Void, result);
+            Assert.AreEqual("", result.ConvertOrError());
+            Assert.AreEqual(CommandExecuteSuccess.Void, result);
         }
 
         internal class TestCommandProvider

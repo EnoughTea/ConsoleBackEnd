@@ -13,12 +13,8 @@ namespace Compro
 
         public MethodInfo ExecutedMethodInfo { get; }
 
-        public ConsoleCommandOnMethod(object executedMethodInstance,
-                                       MethodInfo executedMethodInfo,
-                                       CommandIOPartConverters converters)
+        public ConsoleCommandOnMethod(object executedMethodInstance, MethodInfo executedMethodInfo)
         {
-            if (converters == null) throw new ArgumentNullException(nameof(converters));
-
             ExecutedMethodInstance = executedMethodInstance ??
                 throw new ArgumentNullException(nameof(executedMethodInstance));
             ExecutedMethodInfo = executedMethodInfo ?? throw new ArgumentNullException(nameof(executedMethodInfo));
@@ -28,8 +24,8 @@ namespace Compro
                 .Select(a => a.Alias)
                 .ToList()
                 .AsReadOnly();
-            Result = ExtractResult(executedMethodInfo, converters);
-            Parameters = ExtractParameters(executedMethodInfo, converters);
+            Result = ExtractResult(executedMethodInfo);
+            Parameters = ExtractParameters(executedMethodInfo);
         }
 
         public string Name { get; }
@@ -42,16 +38,16 @@ namespace Compro
 
         public string Description { get; }
 
-        public ICommandCallResult Call(params string[] args)
+        public ICommandExecuteResult Execute(params string[] args)
         {
             var result = from convertedArgs in CommandParameterInfo.ConvertArgs(Parameters, args)
                          from returned in Execute(convertedArgs)
                          select returned;
-            return result.Try().Match<ICommandCallResult>(
+            return result.Try().Match<ICommandExecuteResult>(
                 returned => Result.HasValue
-                    ? new CommandCallSuccess(returned, Result.Converter)
-                    : CommandCallSuccess.Void,
-                e => new CommandCallFailure(e));
+                    ? new CommandExecuteSuccess(returned)
+                    : CommandExecuteSuccess.Void,
+                e => new CommandExecuteFailure(e));
         }
 
         /// <inheritdoc />
@@ -61,58 +57,42 @@ namespace Compro
                 Aliases.Exists(alias => string.Equals(alias, name, StringComparison.OrdinalIgnoreCase));
         }
 
-        public static ConsoleCommandOnMethod[] GatherFromInstance(object instance, CommandIOPartConverters converters)
+        private Try<object?> Execute(object[] convertedArgs)
         {
-            if (instance == null) throw new ArgumentNullException(nameof(instance));
-            if (converters == null) throw new ArgumentNullException(nameof(converters));
-
-            var commandMethodInfos = instance.GetType().GetMethods().Where(methodInfo =>
-                methodInfo.GetCustomAttributes(typeof(CommandExecutableAttribute), false).Length > 0);
-            return commandMethodInfos.Select(cmi => new ConsoleCommandOnMethod(instance, cmi, converters))
-                .ToArray();
-        }
-
-        private Try<object> Execute(object[] convertedArgs)
-        {
-            Result<object> Try()
+            Result<object?> Try()
             {
                 var result = ExecutedMethodInfo.Invoke(ExecutedMethodInstance, convertedArgs);
-                ArrayPools<object>.Return(convertedArgs);
+                ArrayPools<object?>.Return(convertedArgs);
                 return result;
             }
 
             return Try;
         }
 
-        private static IReadOnlyList<CommandParameterInfo> ExtractParameters(MethodInfo executedMethodInfo,
-                                                                             CommandIOPartConverters converters)
+        private static IReadOnlyList<CommandParameterInfo> ExtractParameters(MethodInfo executedMethodInfo)
         {
             var parameterInfos = executedMethodInfo.GetParameters();
             var commandParameters = new List<CommandParameterInfo>(parameterInfos.Length);
-            commandParameters.AddRange(from info in parameterInfos select ToCommandParameterInfo(info, converters));
+            commandParameters.AddRange(from info in parameterInfos select ToCommandParameterInfo(info));
             return commandParameters.AsReadOnly();
         }
 
-        private static CommandParameterInfo ToCommandParameterInfo(ParameterInfo parameterInfo,
-                                                                   CommandIOPartConverters converters)
+        private static CommandParameterInfo ToCommandParameterInfo(ParameterInfo parameterInfo)
         {
             var parameterDoc = parameterInfo.GetCustomAttribute<CommandDocAttribute>();
-            var converter = converters.Get(parameterInfo.ParameterType);
             var defaultInfo = parameterInfo.HasDefaultValue
                 ? new CommandParameterDefault(parameterInfo.DefaultValue)
                 : CommandParameterDefault.None;
-            return new CommandParameterInfo(parameterInfo.ParameterType, defaultInfo, converter,
-                parameterInfo.Name, parameterDoc?.Description ?? "");
+            return new CommandParameterInfo(parameterInfo.ParameterType, defaultInfo, parameterInfo.Name ?? "<unknown>",
+                parameterDoc?.Description ?? "");
         }
 
-        private static CommandReturnInfo ExtractResult(MethodInfo executedMethodInfo,
-                                                       CommandIOPartConverters converters)
+        private static CommandReturnInfo ExtractResult(MethodInfo executedMethodInfo)
         {
             var returnDocAttribute = executedMethodInfo.ReturnTypeCustomAttributes
                 .GetCustomAttributes(typeof(CommandDocAttribute), false)
                 .FirstOrDefault() as CommandDocAttribute;
-            var converter = converters.Get(executedMethodInfo.ReturnType);
-            return new CommandReturnInfo(executedMethodInfo.ReturnType, converter, "returns",
+            return new CommandReturnInfo(executedMethodInfo.ReturnType, "returns",
                 returnDocAttribute?.Description ?? "");
         }
     }

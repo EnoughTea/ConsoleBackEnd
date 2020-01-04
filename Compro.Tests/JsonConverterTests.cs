@@ -8,18 +8,10 @@ namespace Compro.Tests
 {
     public class JsonCommandPieceConverterTests
     {
-        private JsonConverter _defaultConverter;
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            _defaultConverter = new JsonConverter();
-        }
-
         [Test]
         public void FloatsShouldBeConverted()
         {
-            string floatString = _defaultConverter.ConvertToString(0.5f).Try().IfFail(e => e.Message);
+            string floatString = JsonConverter.ToString(0.5f).Try().IfFail(e => e.Message);
 
             Assert.AreEqual("0.5", floatString);
         }
@@ -27,7 +19,7 @@ namespace Compro.Tests
         [Test]
         public void DoublesShouldBeConverted()
         {
-            string doubleString = _defaultConverter.ConvertToString(0.5).IfFail(e => e.Message);
+            string doubleString = JsonConverter.ToString(0.5).IfFail(e => e.Message);
 
             Assert.AreEqual("0.5", doubleString);
         }
@@ -35,7 +27,7 @@ namespace Compro.Tests
         [Test]
         public void NansShouldBeConverted()
         {
-            string nan = _defaultConverter.ConvertToString(float.NaN).IfFail(e => e.Message);
+            string nan = JsonConverter.ToString(float.NaN).IfFail(e => e.Message);
 
             Assert.AreEqual("NaN", nan);
         }
@@ -43,7 +35,7 @@ namespace Compro.Tests
         [Test]
         public void NegativeInfinityShouldBeConverted()
         {
-            string negInf = _defaultConverter.ConvertToString(float.NegativeInfinity).IfFail(e => e.Message);
+            string negInf = JsonConverter.ToString(float.NegativeInfinity).IfFail(e => e.Message);
 
             Assert.AreEqual("-Infinity", negInf);
         }
@@ -51,7 +43,7 @@ namespace Compro.Tests
         [Test]
         public void PositiveInfinityShouldBeConverted()
         {
-            string posInf = _defaultConverter.ConvertToString(float.PositiveInfinity).IfFail(e => e.Message);
+            string posInf = JsonConverter.ToString(float.PositiveInfinity).IfFail(e => e.Message);
 
             Assert.AreEqual("Infinity", posInf);
         }
@@ -59,7 +51,7 @@ namespace Compro.Tests
         [Test]
         public void PositiveInfinityStringShouldBeConverted()
         {
-            float posInf = (float) _defaultConverter.ConvertFromString("Infinity", typeof(float)).IfFail(0f);
+            float posInf = (float) JsonConverter.FromString("Infinity", typeof(float)).IfFail(0f);
 
             Assert.AreEqual(float.PositiveInfinity, posInf);
         }
@@ -68,7 +60,7 @@ namespace Compro.Tests
         public void SimpleStringShouldBeConverted()
         {
             string target = "\"Simple string\"";
-            string simple = (string) _defaultConverter.ConvertFromString(target, typeof(string))
+            string simple = (string) JsonConverter.FromString(target, typeof(string))
                 .IfFail(e => e.Message);
 
             Assert.AreEqual("Simple string", simple);
@@ -78,7 +70,7 @@ namespace Compro.Tests
         public void StringWithNestedQuotesShouldBeConverted()
         {
             string target = "\"Not \\\"so \\\"very\\\" simple\\\" string\"";
-            string nestedQuotes = (string) _defaultConverter.ConvertFromString(target,
+            string nestedQuotes = (string) JsonConverter.FromString(target,
                 typeof(string)).IfFail(e => e.Message);
 
             Assert.AreEqual("Not \"so \"very\" simple\" string", nestedQuotes);
@@ -87,7 +79,7 @@ namespace Compro.Tests
         [Test]
         public void SingleCharShouldBeConverted()
         {
-            string degree = _defaultConverter.ConvertToString('\u00f8')
+            string degree = JsonConverter.ToString('\u00f8')
                 .IfFail(e => e.Message);
 
             Assert.AreEqual("\u00f8", degree);

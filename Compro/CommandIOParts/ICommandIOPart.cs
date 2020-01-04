@@ -8,7 +8,5 @@ namespace Compro {
         string Description { get; }
 
         Type Type { get; }
-
-        ICommandIOPartConverter Converter { get; }
     }
 }

@@ -11,23 +11,22 @@ namespace Compro
 
         public CommandParameterInfo(Type type,
                                     CommandParameterDefault defaultValue,
-                                    ICommandIOPartConverter converter,
                                     string name = "",
                                     string description = "")
-            : base(type, converter, name, description) =>
+            : base(type, name, description) =>
             Default = defaultValue ?? throw new ArgumentNullException(nameof(defaultValue));
 
-        internal static Try<object[]> ConvertArgs(IReadOnlyList<CommandParameterInfo> parameterInfos,
-                                                string[] args)
+        internal static Try<object?[]> ConvertArgs(IReadOnlyList<CommandParameterInfo> parameterInfos,
+                                                   string[] args)
         {
-            Result<object[]> InnerTry()
+            Result<object?[]> InnerTry()
             {
                 if (args.Length > parameterInfos.Count) {
                     throw new ArgumentException($"Passed {args.Length} argument(s), but there are " +
                         $"${parameterInfos.Count} command parameters.");
                 }
 
-                var convertedArgs = ArrayPools<object>.Request(parameterInfos.Count);
+                var convertedArgs = ArrayPools<object?>.Request(parameterInfos.Count);
                 for (int index = 0; index < parameterInfos.Count; index++) {
                     var currentParamInfo = parameterInfos[index];
                     if (args.Length > index) {
@@ -50,10 +49,10 @@ namespace Compro
 
         private static void ConvertAndSetArg(ICommandIOPart currentParamInfo,
                                              string argRepr,
-                                             object[] convertedArgs,
+                                             object?[] convertedArgs,
                                              int index)
         {
-            var conversionResult = currentParamInfo.Converter.ConvertFromString(argRepr, currentParamInfo.Type).Try();
+            var conversionResult = JsonConverter.FromString(argRepr, currentParamInfo.Type).Try();
             if (conversionResult.IsSuccess) {
                 convertedArgs[index] = conversionResult.IfFail(null);
             } else {

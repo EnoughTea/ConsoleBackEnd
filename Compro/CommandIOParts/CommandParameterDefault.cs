@@ -4,11 +4,11 @@ namespace Compro
     {
         public static CommandParameterDefault None { get; } = new CommandParameterDefault();
 
-        public object Value { get; }
+        public object? Value { get; }
 
         public bool HasDefault { get; }
 
-        public CommandParameterDefault(object defaultValue)
+        public CommandParameterDefault(object? defaultValue)
         {
             Value = defaultValue;
             HasDefault = true;

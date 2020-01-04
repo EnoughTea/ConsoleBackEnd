@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Compro
@@ -16,7 +15,7 @@ namespace Compro
 
         CommandReturnInfo Result { get; }
 
-        ICommandCallResult Call(params string[] args);
+        ICommandExecuteResult Execute(params string[] args);
 
         bool CanBeCalledBy(string name);
     }
