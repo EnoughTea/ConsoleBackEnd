@@ -8,13 +8,13 @@ namespace Compro.Tests
     public class TerminalCommandOnMethodTests
     {
         private TestCommandProvider _commandProvider;
-        private TerminalCommandOnMethod[] _commands;
+        private ConsoleCommandOnMethod[] _commands;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _commandProvider = new TestCommandProvider();
-            _commands = TerminalCommandOnMethod.GatherFromInstance(_commandProvider, CommandIOPartConverters.Shared);
+            _commands = ConsoleCommandOnMethod.GatherFromInstance(_commandProvider, CommandIOPartConverters.Shared);
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace Compro.Tests
         {
             var findCommand = _commands.First(c => c.Name == "Find");
 
-            var result = findCommand.Call("Macron");
+            var result = findCommand.Call("\"Macron\"");
 
             Assert.IsTrue(result.ConvertedValue.Contains("Putin"), result.ConvertedValue);
             Assert.AreNotEqual(CommandCallSuccess.Void, result);

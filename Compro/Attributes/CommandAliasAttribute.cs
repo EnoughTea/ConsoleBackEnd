@@ -2,7 +2,7 @@ using System;
 
 namespace Compro
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class CommandAliasAttribute : Attribute
     {
         public string Alias { get; }

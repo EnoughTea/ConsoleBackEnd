@@ -28,20 +28,12 @@ namespace Compro
             if (repr == null) throw new ArgumentNullException(nameof(repr));
             if (targetType == null) throw new ArgumentNullException(nameof(targetType));
 
-            return targetType switch {
-                _ when targetType == typeof(string) => DeserializeNoOp(repr),
-                _ when targetType == typeof(char) => DeserializeNoOp(repr.FirstOrDefault()),
-                _ => Deserialize(repr, targetType)
-            };
+            return Deserialize(repr, targetType);
         }
 
         public Try<string> ConvertToString<T>(T value)
         {
-            return value switch {
-                string stringValue => SerializeNoOp(stringValue),
-                char charValue => SerializeNoOp(charValue.ToString()),
-                _ => Serialize(value)
-            };
+            return Serialize(value);
         }
 
         // Stuff below used to avoid closure allocations.

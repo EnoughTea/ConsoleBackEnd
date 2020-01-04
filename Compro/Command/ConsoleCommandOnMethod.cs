@@ -7,13 +7,13 @@ using LanguageExt.Common;
 
 namespace Compro
 {
-    public class TerminalCommandOnMethod : ITerminalCommand
+    public class ConsoleCommandOnMethod : IConsoleCommand
     {
         public object ExecutedMethodInstance { get; }
 
         public MethodInfo ExecutedMethodInfo { get; }
 
-        public TerminalCommandOnMethod(object executedMethodInstance,
+        public ConsoleCommandOnMethod(object executedMethodInstance,
                                        MethodInfo executedMethodInfo,
                                        CommandIOPartConverters converters)
         {
@@ -24,11 +24,17 @@ namespace Compro
             ExecutedMethodInfo = executedMethodInfo ?? throw new ArgumentNullException(nameof(executedMethodInfo));
             Name = executedMethodInfo.Name;
             Description = executedMethodInfo.GetCustomAttribute<CommandExecutableAttribute>()?.Description ?? "";
+            Aliases = executedMethodInfo.GetCustomAttributes<CommandAliasAttribute>()
+                .Select(a => a.Alias)
+                .ToList()
+                .AsReadOnly();
             Result = ExtractResult(executedMethodInfo, converters);
             Parameters = ExtractParameters(executedMethodInfo, converters);
         }
 
         public string Name { get; }
+        
+        public IReadOnlyList<string> Aliases { get; }
 
         public IReadOnlyList<CommandParameterInfo> Parameters { get; }
 
@@ -48,14 +54,21 @@ namespace Compro
                 e => new CommandCallFailure(e));
         }
 
-        public static TerminalCommandOnMethod[] GatherFromInstance(object instance, CommandIOPartConverters converters)
+        /// <inheritdoc />
+        public bool CanBeCalledBy(string name)
+        {
+            return string.Equals(Name, name, StringComparison.OrdinalIgnoreCase) ||
+                Aliases.Exists(alias => string.Equals(alias, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static ConsoleCommandOnMethod[] GatherFromInstance(object instance, CommandIOPartConverters converters)
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
             if (converters == null) throw new ArgumentNullException(nameof(converters));
 
             var commandMethodInfos = instance.GetType().GetMethods().Where(methodInfo =>
                 methodInfo.GetCustomAttributes(typeof(CommandExecutableAttribute), false).Length > 0);
-            return commandMethodInfos.Select(cmi => new TerminalCommandOnMethod(instance, cmi, converters))
+            return commandMethodInfos.Select(cmi => new ConsoleCommandOnMethod(instance, cmi, converters))
                 .ToArray();
         }
 

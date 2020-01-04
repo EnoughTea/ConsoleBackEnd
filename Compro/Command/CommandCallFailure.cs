@@ -5,6 +5,7 @@ namespace Compro {
     {
         public CommandCallFailure(Exception e)
         {
+            Exception = e ?? throw new ArgumentNullException(nameof(e));
             ReturnedValue = CommandCallSuccess.Void.ReturnedValue;
             ConvertedValue = CommandCallSuccess.Void.ConvertedValue;
         }

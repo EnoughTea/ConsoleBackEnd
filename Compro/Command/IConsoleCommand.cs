@@ -4,9 +4,11 @@ using System.Collections.Generic;
 namespace Compro
 {
     /// <summary> Represents a terminal command which can be executed with given arguments. </summary>
-    public interface ITerminalCommand
+    public interface IConsoleCommand
     {
         string Name { get; }
+        
+        IReadOnlyList<string> Aliases { get; }
 
         string Description { get; }
 
@@ -15,5 +17,7 @@ namespace Compro
         CommandReturnInfo Result { get; }
 
         ICommandCallResult Call(params string[] args);
+
+        bool CanBeCalledBy(string name);
     }
 }
