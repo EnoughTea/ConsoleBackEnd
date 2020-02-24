@@ -7,18 +7,29 @@ using LanguageExt.Common;
 
 namespace Compro
 {
-    public class ConsoleCommandOnMethod : IConsoleCommand
+    public class ConsoleCommand : IConsoleCommand
     {
-        public object ExecutedMethodInstance { get; }
+        public object? ExecutedMethodInstance { get; }
 
         public MethodInfo ExecutedMethodInfo { get; }
 
-        public ConsoleCommandOnMethod(object executedMethodInstance, MethodInfo executedMethodInfo)
+        public string Name { get; }
+
+        public IReadOnlyList<string> Aliases { get; }
+
+        public IReadOnlyList<CommandParameterInfo> Parameters { get; }
+
+        public ICommandReturnInfo Result { get; }
+
+        public string Description { get; }
+
+        public ConsoleCommand(object executedMethodInstance,
+                              MethodInfo executedMethodInfo,
+                              string nameOverride = "")
         {
-            ExecutedMethodInstance = executedMethodInstance ??
-                throw new ArgumentNullException(nameof(executedMethodInstance));
+            ExecutedMethodInstance = executedMethodInstance;
             ExecutedMethodInfo = executedMethodInfo ?? throw new ArgumentNullException(nameof(executedMethodInfo));
-            Name = executedMethodInfo.Name;
+            Name = string.IsNullOrWhiteSpace(nameOverride) ? executedMethodInfo.Name : nameOverride;
             Description = executedMethodInfo.GetCustomAttribute<CommandExecutableAttribute>()?.Description ?? "";
             Aliases = executedMethodInfo.GetCustomAttributes<CommandAliasAttribute>()
                 .Select(a => a.Alias)
@@ -28,16 +39,6 @@ namespace Compro
             Parameters = ExtractParameters(executedMethodInfo);
         }
 
-        public string Name { get; }
-        
-        public IReadOnlyList<string> Aliases { get; }
-
-        public IReadOnlyList<CommandParameterInfo> Parameters { get; }
-
-        public CommandReturnInfo Result { get; }
-
-        public string Description { get; }
-
         public ICommandExecuteResult Execute(params string[] args)
         {
             var result = from convertedArgs in CommandParameterInfo.ConvertArgs(Parameters, args)
@@ -45,9 +46,9 @@ namespace Compro
                          select returned;
             return result.Try().Match<ICommandExecuteResult>(
                 returned => Result.HasValue
-                    ? new CommandExecuteSuccess(returned)
-                    : CommandExecuteSuccess.Void,
-                e => new CommandExecuteFailure(e));
+                    ? new ConsoleCommandExecuteSuccess(returned)
+                    : ConsoleCommandExecuteSuccess.Void,
+                e => new ConsoleCommandExecuteFailure(e));
         }
 
         /// <inheritdoc />

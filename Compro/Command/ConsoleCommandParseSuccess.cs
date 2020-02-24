@@ -22,9 +22,9 @@ namespace Compro
         public ConsoleCommandParseSuccess(string commandName) : this(commandName, ParsedConsoleCommand.ZeroArgs) { }
         
         /// <inheritdoc />
-        public Try<ParsedConsoleCommand> Get()
+        public Try<IParsedConsoleCommand> Get()
         {
-            Result<ParsedConsoleCommand> Try()
+            Result<IParsedConsoleCommand> Try()
             {
                 return Command;
             }

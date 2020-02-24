@@ -5,10 +5,10 @@ using NUnit.Framework;
 
 namespace Compro.Tests
 {
-    public class TerminalCommandOnMethodTests
+    public class ConsoleCommandOnMethodTests
     {
         private TestCommandProvider _commandProvider;
-        private ConsoleCommandOnMethod[] _commands;
+        private ConsoleCommand[] _commands;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -24,8 +24,23 @@ namespace Compro.Tests
 
             var result = sqrtCommand.Execute("0.25");
             var converted = result.ConvertOrError();
-            
+
             Assert.AreEqual("0.5", converted);
+            var success = result as ConsoleCommandExecuteSuccess;
+            Assert.NotNull(success);
+            Assert.True(Equals(success.ReturnedValue, 0.5f));
+        }
+
+        [Test]
+        public void LambdaCommandShouldWorkOutOfTheBox()
+        {
+            var plusOneToString = (Func<int, string>)(i => (i + 1).ToString());
+            var command = new ConsoleCommand(plusOneToString.Target, plusOneToString.Method);
+
+            var result = command.Execute("1");
+            var converted = result.ConvertOrError();
+
+            Assert.AreEqual("\"2\"", converted);
         }
 
         [Test]
@@ -36,7 +51,7 @@ namespace Compro.Tests
             var result = findCommand.Execute("\"Macron\"");
             var converted = result.ConvertOrError();
 
-            Assert.AreNotEqual(CommandExecuteSuccess.Void, result);
+            Assert.AreNotEqual(ConsoleCommandExecuteSuccess.Void, result);
             Assert.IsTrue(converted.Contains("Putin"));
         }
 
@@ -48,12 +63,26 @@ namespace Compro.Tests
             var result = printCommand.Execute();
 
             Assert.AreEqual("", result.ConvertOrError());
-            Assert.AreEqual(CommandExecuteSuccess.Void, result);
+            Assert.AreEqual(ConsoleCommandExecuteSuccess.Void, result);
         }
 
+        [Test]
+        public void CommandShouldReturnExceptionStringOnError()
+        {
+            var sqrtCommand = _commands.First(c => c.Name == "Sqrt");
+
+            var result = sqrtCommand.Execute("\"not a float\"");
+            var failure = result as ConsoleCommandExecuteFailure;
+            
+            Assert.NotNull(failure);
+            Assert.That(failure.Exception is ArgumentException);
+            var converted = result.ConvertOrError();
+            Assert.That(converted.StartsWith("System.ArgumentException: Could not convert string to double"));
+        }
+        
         internal class TestCommandProvider
         {
-            private static readonly Person putin = new Person {
+            private static readonly Person _Putin = new Person {
                 Name = "Putin",
                 Position = new Geoposition {
                     Latitude = 55.7558,
@@ -61,16 +90,16 @@ namespace Compro.Tests
                 }
             };
 
-            private static readonly Person macron = new Person {
+            private static readonly Person _Macron = new Person {
                 Name = "Macron",
                 Position = new Geoposition {
                     Latitude = 48.8566,
                     Longitude = 2.3522
                 },
-                Friends = { putin }
+                Friends = { _Putin }
             };
 
-            private readonly List<Person> _persons = new List<Person> { putin, macron };
+            private readonly List<Person> _persons = new List<Person> { _Putin, _Macron };
 
             [CommandExecutable]
             public float Sqrt(float value) => (float) Math.Sqrt(value);

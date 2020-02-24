@@ -4,15 +4,14 @@ using LanguageExt.Common;
 
 namespace Compro
 {
-    public class CommandExecuteFailure : ICommandExecuteResult
+    /// <inheritdoc />
+    public class ConsoleCommandExecuteFailure : IConsoleCommandExecuteFailure
     {
-        /// <inheritdoc />
         public Exception Exception { get; }
 
-        /// <inheritdoc />
         public bool IsSuccess => false;
 
-        public CommandExecuteFailure(Exception e)
+        public ConsoleCommandExecuteFailure(Exception e)
         {
             Exception = e ?? throw new ArgumentNullException(nameof(e));
         }

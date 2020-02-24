@@ -2,8 +2,12 @@ using System;
 
 namespace Compro
 {
-    public class CommandReturnInfo : CommandIOPart
+    /// <summary> Metadata for a command return value. </summary>
+    public class CommandReturnInfo : CommandIOPart, ICommandReturnInfo
     {
+        /// <summary>
+        /// Gets the value indicating whether the command returns something or not (returns void).
+        /// </summary>
         public bool HasValue => Type != null && Type != typeof(void);
 
         public CommandReturnInfo(Type type,

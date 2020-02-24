@@ -1,16 +1,25 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Compro
 {
-    public class ConsoleCommands
+    public class ConsoleCommands : IConsoleCommands
     {
         private readonly ConcurrentDictionary<string, IConsoleCommand> _commands =
             new ConcurrentDictionary<string, IConsoleCommand>(StringComparer.OrdinalIgnoreCase);
 
-        private readonly ConsoleCommandParser _parser = new ConsoleCommandParser();
+        private readonly IConsoleCommandParser _parser;
+
+        /// <summary> Uses default console command parser. </summary>
+        public ConsoleCommands() : this(ConsoleCommandParser.Default) { }
+
+        public ConsoleCommands(IConsoleCommandParser parser)
+        {
+            _parser = parser ?? throw new ArgumentNullException(nameof(parser));
+        }
 
         public ICommandExecuteResult Execute(string commandName, params string[] commandArgs)
         {
@@ -18,7 +27,7 @@ namespace Compro
                 return command.Execute(commandArgs);
             }
 
-            return new CommandExecuteFailure(new ArgumentException($"Command '{commandName}' was not found",
+            return new ConsoleCommandExecuteFailure(new ArgumentException($"Command '{commandName}' was not found",
                 nameof(commandName)));
         }
 
@@ -26,7 +35,7 @@ namespace Compro
         {
             var parseResult = _parser.Parse(commandRepr);
             return parseResult.Get().Match(parsed => Execute(parsed.Name, parsed.Args),
-                e => new CommandExecuteFailure(e));
+                e => new ConsoleCommandExecuteFailure(e));
         }
 
         public void Register(IConsoleCommand command)
@@ -46,29 +55,41 @@ namespace Compro
             return _commands.TryRemove(name, out _);
         }
 
-        public void Unregister(IEnumerable<string> names)
+        public void UnregisterAll()
         {
-            foreach (var name in names) {
-                Unregister(name);
-            }
+            _commands.Clear();
         }
-        
-        public void RegisterCommandsFromInstance(object instance)
+
+        public void RegisterAllFromInstance(object instance)
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
 
-            foreach (var command in GatherFromInstance(instance)) {
+            var commands = GatherFromInstance(instance);
+            foreach (var command in commands) {
                 Register(command);
             }
         }
 
-        internal static ConsoleCommandOnMethod[] GatherFromInstance(object instance)
+        public bool IsRegistered(string commandName)
+        {
+            if (commandName == null) throw new ArgumentNullException(nameof(commandName));
+
+            return _commands.ContainsKey(commandName);
+        }
+
+        /// <inheritdoc />
+        public IEnumerator<IConsoleCommand> GetEnumerator() => _commands.Values.GetEnumerator();
+
+        /// <inheritdoc />
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        internal static ConsoleCommand[] GatherFromInstance(object instance)
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
 
             var commandMethodInfos = instance.GetType().GetMethods().Where(methodInfo =>
                 methodInfo.GetCustomAttributes(typeof(CommandExecutableAttribute), false).Length > 0);
-            return commandMethodInfos.Select(cmi => new ConsoleCommandOnMethod(instance, cmi))
+            return commandMethodInfos.Select(cmi => new ConsoleCommand(instance, cmi))
                 .ToArray();
         }
     }

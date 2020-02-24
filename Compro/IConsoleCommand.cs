@@ -13,7 +13,7 @@ namespace Compro
 
         IReadOnlyList<CommandParameterInfo> Parameters { get; }
 
-        CommandReturnInfo Result { get; }
+        ICommandReturnInfo Result { get; }
 
         ICommandExecuteResult Execute(params string[] args);
 

@@ -2,18 +2,18 @@ using LanguageExt;
 
 namespace Compro
 {
-    public class CommandExecuteSuccess : ICommandExecuteResult
+    /// <inheritdoc />
+    public class ConsoleCommandExecuteSuccess : IConsoleCommandExecuteSuccess
     {
-        public static CommandExecuteSuccess Void { get; } = new CommandExecuteSuccess();
-        
+        public static ConsoleCommandExecuteSuccess Void { get; } = new ConsoleCommandExecuteSuccess();
+
         public object? ReturnedValue { get; }
-        
+
         public bool HasValue { get; }
 
-        /// <inheritdoc />
         public bool IsSuccess => true;
 
-        public CommandExecuteSuccess(object returnedValue)
+        public ConsoleCommandExecuteSuccess(object returnedValue)
         {
             ReturnedValue = returnedValue;
             HasValue = true;
@@ -21,7 +21,7 @@ namespace Compro
 
         public Try<string> Convert() => JsonConverter.ToString(ReturnedValue);
 
-        private CommandExecuteSuccess()
+        private ConsoleCommandExecuteSuccess()
         {
             ReturnedValue = typeof(void);
         }

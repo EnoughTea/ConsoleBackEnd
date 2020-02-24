@@ -1,12 +1,17 @@
 using System;
 
-namespace Compro {
-    public abstract class CommandIOPart: ICommandIOPart
+namespace Compro
+{
+    /// <inheritdoc />
+    public abstract class CommandIOPart : ICommandIOPart
     {
+        /// <inheritdoc />
         public string Name { get; }
 
+        /// <inheritdoc />
         public string Description { get; }
 
+        /// <inheritdoc />
         public Type Type { get; }
 
         protected CommandIOPart(Type type,

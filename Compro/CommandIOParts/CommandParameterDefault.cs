@@ -1,6 +1,7 @@
 namespace Compro
 {
-    public class CommandParameterDefault
+    /// <inheritdoc />
+    public class CommandParameterDefault : ICommandParameterDefault
     {
         public static CommandParameterDefault None { get; } = new CommandParameterDefault();
 
@@ -14,6 +15,6 @@ namespace Compro
             HasDefault = true;
         }
 
-        public CommandParameterDefault() {}
+        public CommandParameterDefault() { }
     }
 }

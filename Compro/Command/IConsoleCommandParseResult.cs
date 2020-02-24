@@ -7,8 +7,8 @@ namespace Compro
     {
         bool IsSuccess { get; }
 
-        Try<ParsedConsoleCommand> Get();
+        Try<IParsedConsoleCommand> Get();
 
-        ParsedConsoleCommand GetOrEmpty() => Get().IfFail(ParsedConsoleCommand.Empty);
+        IParsedConsoleCommand GetOrEmpty() => Get().IfFail(ParsedConsoleCommand.Empty);
     }
 }

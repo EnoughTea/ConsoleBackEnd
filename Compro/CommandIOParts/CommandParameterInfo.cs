@@ -5,9 +5,14 @@ using LanguageExt.Common;
 
 namespace Compro
 {
-    public class CommandParameterInfo : CommandIOPart
+    /// <summary> Metadata for a command argument. </summary>
+    public class CommandParameterInfo : CommandIOPart, ICommandParameterInfo
     {
-        public CommandParameterDefault Default { get; }
+        /// <summary>
+        /// Gets metadata for an argument's default value, if any. References global
+        /// <see cref="CommandParameterDefault.None"/> for an argument without default value.
+        /// </summary>
+        public ICommandParameterDefault Default { get; }
 
         public CommandParameterInfo(Type type,
                                     CommandParameterDefault defaultValue,
@@ -16,6 +21,14 @@ namespace Compro
             : base(type, name, description) =>
             Default = defaultValue ?? throw new ArgumentNullException(nameof(defaultValue));
 
+        /// <summary>
+        /// Converts given string arguments to their typed version using passed parameter infos as a 'scheme'.
+        /// </summary>
+        /// <param name="parameterInfos">Parameter infos serving as a 'scheme' for args.</param>
+        /// <param name="args">Args to map onto passed parameter infos.</param>
+        /// <returns> Array with converted arguments. It is requested from <see cref="ArrayPools{T}"/>,
+        /// so do not forget to return it there when you're done with it.</returns>
+        /// <exception cref="ArgumentException">Not enough arguments for passed parameter infos.</exception>
         internal static Try<object?[]> ConvertArgs(IReadOnlyList<CommandParameterInfo> parameterInfos,
                                                    string[] args)
         {
@@ -46,7 +59,7 @@ namespace Compro
 
             return InnerTry;
         }
-
+        
         private static void ConvertAndSetArg(ICommandIOPart currentParamInfo,
                                              string argRepr,
                                              object?[] convertedArgs,

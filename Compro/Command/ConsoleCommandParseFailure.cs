@@ -20,9 +20,9 @@ namespace Compro
         }
 
         /// <inheritdoc />
-        public Try<ParsedConsoleCommand> Get()
+        public Try<IParsedConsoleCommand> Get()
         {
-            Result<ParsedConsoleCommand> Try()
+            Result<IParsedConsoleCommand> Try()
             {
                 throw Exception;
             }

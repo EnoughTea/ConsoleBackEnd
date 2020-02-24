@@ -5,8 +5,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Compro
 {
-    public class ConsoleCommandParser
+    public class ConsoleCommandParser: IConsoleCommandParser
     {
+        public static ConsoleCommandParser Default { get; } = new ConsoleCommandParser();
+
         public IConsoleCommandParseResult Parse(string commandRepr)
         {
             var failure = InitialValidation(commandRepr, out string trimmed);
