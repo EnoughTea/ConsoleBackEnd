@@ -34,7 +34,7 @@ namespace Compro.Tests
         [Test]
         public void LambdaCommandShouldWorkOutOfTheBox()
         {
-            var plusOneToString = (Func<int, string>)(i => (i + 1).ToString());
+            var plusOneToString = (Func<int, string>) (i => (i + 1).ToString());
             var command = new ConsoleCommand(plusOneToString.Target, plusOneToString.Method);
 
             var result = command.Execute("1");
@@ -73,13 +73,13 @@ namespace Compro.Tests
 
             var result = sqrtCommand.Execute("\"not a float\"");
             var failure = result as ConsoleCommandExecuteFailure;
-            
+
             Assert.NotNull(failure);
             Assert.That(failure.Exception is ArgumentException);
             var converted = result.ConvertOrError();
             Assert.That(converted.StartsWith("System.ArgumentException: Could not convert string to double"));
         }
-        
+
         internal class TestCommandProvider
         {
             private static readonly Person _Putin = new Person {

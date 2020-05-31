@@ -1,4 +1,5 @@
 using LanguageExt;
+using LanguageExt.Common;
 
 namespace Compro
 {
@@ -19,7 +20,11 @@ namespace Compro
             HasValue = true;
         }
 
-        public Try<string> Convert() => JsonConverter.ToString(ReturnedValue);
+        public Try<string> Convert()
+        {
+            static Result<string> NoValueRepr() => "";
+            return HasValue ? JsonConverter.ToString(ReturnedValue) : NoValueRepr;
+        }
 
         private ConsoleCommandExecuteSuccess()
         {

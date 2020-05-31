@@ -1,11 +1,9 @@
 using System;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using LanguageExt;
 using LanguageExt.Common;
 using Newtonsoft.Json;
 
-[assembly: InternalsVisibleTo(nameof(Compro) + ".Tests")]
 namespace Compro
 {
     internal static class JsonConverter
@@ -16,7 +14,7 @@ namespace Compro
             NullValueHandling = NullValueHandling.Ignore,
             PreserveReferencesHandling = PreserveReferencesHandling.All
         };
-        
+
         public static Try<object?> FromString(string repr, Type targetType)
         {
             if (repr == null) throw new ArgumentNullException(nameof(repr));
@@ -29,7 +27,7 @@ namespace Compro
 
             return Try;
         }
-        
+
         public static Try<string> ToString<T>(T value)
         {
             Result<string> Try()
