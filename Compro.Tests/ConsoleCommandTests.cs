@@ -80,37 +80,55 @@ namespace Compro.Tests
             Assert.That(converted.StartsWith("System.ArgumentException: Could not convert string to double"));
         }
 
-        internal class TestCommandProvider
+        [Test]
+        public void CommandsWithCollectionReturnShouldWorkOutOfTheBox()
         {
-            private static readonly Person _Tchaikovsky = new Person {
-                Name = "Tchaikovsky",
-                Position = new Geoposition {
-                    Latitude = 55.7558,
-                    Longitude = 37.6173
-                }
-            };
+            var allCommand = _commands.First(c => c.Name == "All");
 
-            private static readonly Person _Debussy = new Person {
-                Name = "Debussy",
-                Position = new Geoposition {
-                    Latitude = 48.8566,
-                    Longitude = 2.3522
-                },
-                Friends = { _Tchaikovsky }
-            };
+            var result = (ConsoleCommandExecuteSuccess) allCommand.Execute();
+            var returnedValue = (IReadOnlyList<Person>) result.ReturnedValue;
 
-            private readonly List<Person> _persons = new List<Person> { _Tchaikovsky, _Debussy };
-
-            [CommandExecutable]
-            public float Sqrt(float value) => (float) Math.Sqrt(value);
-
-            [CommandExecutable]
-            public void PrintLocalTime() => Console.WriteLine(DateTime.Now.ToLongTimeString());
-
-            [CommandExecutable("Finds a person by name in the predefined person database.")]
-            [return: CommandDoc("Found person or null.")]
-            public Person Find([CommandDoc("Person's name.")] string name) =>
-                _persons.Find(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+            Assert.That(!ReferenceEquals(_commandProvider.Persons, returnedValue));
+            CollectionAssert.AreEqual(_commandProvider.Persons, returnedValue);
         }
+    }
+
+    internal class TestCommandProvider
+    {
+        private static readonly Person _Tchaikovsky = new Person {
+            Name = "Tchaikovsky",
+            Position = new Geoposition {
+                Latitude = 55.7558,
+                Longitude = 37.6173
+            }
+        };
+
+        private static readonly Person _Debussy = new Person {
+            Name = "Debussy",
+            Position = new Geoposition {
+                Latitude = 48.8566,
+                Longitude = 2.3522
+            },
+            Friends = { _Tchaikovsky }
+        };
+
+        public List<Person> Persons { get; } = new List<Person> { _Tchaikovsky, _Debussy };
+
+        [CommandExecutable]
+        public float Sqrt(float value) => (float) Math.Sqrt(value);
+
+        [CommandExecutable]
+        public void PrintLocalTime() => Console.WriteLine(DateTime.Now.ToLongTimeString());
+
+        [CommandExecutable("Finds a person by name in the predefined person database.")]
+        [return: CommandDoc("Found person or null.")]
+        public Person Find([CommandDoc("Person's name.")] string name) =>
+            Persons.Find(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+
+        [CommandExecutable]
+        public Person Find(Geoposition geoPos) => Persons.Find(p => p.Position == geoPos);
+
+        [CommandExecutable]
+        public IReadOnlyList<Person> All() => Persons.AsReadOnly();
     }
 }

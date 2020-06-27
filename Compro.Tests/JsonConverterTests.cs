@@ -1,7 +1,5 @@
 using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Compro.Tests
@@ -55,7 +53,7 @@ namespace Compro.Tests
 
             Assert.AreEqual(float.PositiveInfinity, posInf);
         }
-        
+
         [Test]
         public void SimpleStringShouldBeConverted()
         {
@@ -65,7 +63,7 @@ namespace Compro.Tests
 
             Assert.AreEqual("Simple string", simple);
         }
-        
+
         [Test]
         public void StringWithNestedQuotesShouldBeConverted()
         {
@@ -75,7 +73,7 @@ namespace Compro.Tests
 
             Assert.AreEqual("Not \"so \"very\" simple\" string", nestedQuotes);
         }
-        
+
         [Test]
         public void SingleCharShouldBeConverted()
         {
@@ -83,6 +81,20 @@ namespace Compro.Tests
                 .IfFail(e => e.Message);
 
             Assert.AreEqual("\u00f8", degree);
+        }
+
+        [Test]
+        public void ReferensesShouldBeDeserialized()
+        {
+            string personsRepr = @"[
+{""$id"":""1"",""Name"":""Tchaikovsky"",""Position"":{""Latitude"":55.7558,""Longitude"":37.6173},""Friends"":[]},
+{""$id"":""2"",""Name"":""Debussy"",""Position"":{""Latitude"":48.8566,""Longitude"":2.3522},""Friends"":[{""$ref"":""1""}]}
+]";
+            var persons = (Person[]) JsonConverter.FromString(personsRepr, typeof(Person[]))
+                .IfFail(Array.Empty<Person>());
+
+            Assert.That(persons.Length == 2);
+            Assert.That(persons[1].Friends.First() == persons.First());
         }
     }
 }
