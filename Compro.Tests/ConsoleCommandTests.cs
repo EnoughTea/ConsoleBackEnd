@@ -35,7 +35,7 @@ namespace Compro.Tests
         public void LambdaCommandShouldWorkOutOfTheBox()
         {
             var plusOneToString = (Func<int, string>) (i => (i + 1).ToString());
-            var command = new ConsoleCommand(plusOneToString.Target, plusOneToString.Method);
+            var command = new ConsoleCommand(plusOneToString.Target!, plusOneToString.Method);
 
             var result = command.Execute("1");
             var converted = result.ConvertOrError();
@@ -48,11 +48,11 @@ namespace Compro.Tests
         {
             var findCommand = _commands.First(c => c.Name == "Find");
 
-            var result = findCommand.Execute("\"Macron\"");
+            var result = findCommand.Execute("\"Debussy\"");
             var converted = result.ConvertOrError();
 
             Assert.AreNotEqual(ConsoleCommandExecuteSuccess.Void, result);
-            Assert.IsTrue(converted.Contains("Putin"));
+            Assert.IsTrue(converted.Contains("Tchaikovsky"));
         }
 
         [Test]
@@ -82,24 +82,24 @@ namespace Compro.Tests
 
         internal class TestCommandProvider
         {
-            private static readonly Person _Putin = new Person {
-                Name = "Putin",
+            private static readonly Person _Tchaikovsky = new Person {
+                Name = "Tchaikovsky",
                 Position = new Geoposition {
                     Latitude = 55.7558,
                     Longitude = 37.6173
                 }
             };
 
-            private static readonly Person _Macron = new Person {
-                Name = "Macron",
+            private static readonly Person _Debussy = new Person {
+                Name = "Debussy",
                 Position = new Geoposition {
                     Latitude = 48.8566,
                     Longitude = 2.3522
                 },
-                Friends = { _Putin }
+                Friends = { _Tchaikovsky }
             };
 
-            private readonly List<Person> _persons = new List<Person> { _Putin, _Macron };
+            private readonly List<Person> _persons = new List<Person> { _Tchaikovsky, _Debussy };
 
             [CommandExecutable]
             public float Sqrt(float value) => (float) Math.Sqrt(value);
