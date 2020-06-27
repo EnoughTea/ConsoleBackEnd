@@ -6,14 +6,20 @@ using Newtonsoft.Json;
 
 namespace Compro
 {
-    internal static class JsonConverter
+    public static class JsonConverter
     {
-        private static readonly JsonSerializerSettings _DefaultSettings = new JsonSerializerSettings {
+        public static JsonSerializerSettings DefaultSettings { get; } = new JsonSerializerSettings {
             Culture = CultureInfo.InvariantCulture,
             DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-            NullValueHandling = NullValueHandling.Ignore,
-            PreserveReferencesHandling = PreserveReferencesHandling.All
+            NullValueHandling = NullValueHandling.Ignore
         };
+
+        private static JsonSerializerSettings _usedSettings = DefaultSettings;
+
+        public static void ChangeSettings(JsonSerializerSettings settings)
+        {
+            _usedSettings = settings ?? DefaultSettings;
+        }
 
         public static Try<object?> FromString(string repr, Type targetType)
         {
@@ -22,7 +28,7 @@ namespace Compro
 
             Result<object?> Try()
             {
-                return JsonConvert.DeserializeObject(repr, targetType, _DefaultSettings);
+                return JsonConvert.DeserializeObject(repr, targetType, _usedSettings);
             }
 
             return Try;
@@ -32,7 +38,7 @@ namespace Compro
         {
             Result<string> Try()
             {
-                string serialized = JsonConvert.SerializeObject(value, _DefaultSettings);
+                string serialized = JsonConvert.SerializeObject(value, _usedSettings);
                 return !(value is null)
                     ? value.GetType().IsPrimitive ? serialized.Replace("\"", "") : serialized
                     : "null";
