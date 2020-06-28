@@ -1,4 +1,5 @@
 using LanguageExt;
+using Newtonsoft.Json;
 
 namespace Compro
 {
@@ -11,15 +12,18 @@ namespace Compro
         /// <summary>
         /// Converts object returned by a successfully executed command to string with the help of a json serializer.
         /// </summary>
+        /// <param name="serializerSettings">JSON serializer settings.</param>
         /// <param name="unescape">If true, returned string will be unescaped.</param>
         /// <returns>String representation of the command return value.</returns>
-        Try<string> Convert(bool unescape = true);
+        Try<string> Convert(JsonSerializerSettings? serializerSettings = null, bool unescape = true);
 
         /// <summary>
         /// Converts object returned by a successfully executed command to string with the help of a json serializer.
         /// </summary>
+        /// <param name="serializerSettings">JSON serializer settings.</param>
         /// <param name="unescape">If true, returned string will be unescaped.</param>
         /// <returns>String representation of either the command return value or command execution error.</returns>
-        string ConvertOrError(bool unescape = true) => Convert(unescape).IfFail(e => e.ToString());
+        string ConvertOrError(JsonSerializerSettings? serializerSettings = null, bool unescape = true) =>
+            Convert(serializerSettings, unescape).IfFail(e => e.ToString());
     }
 }

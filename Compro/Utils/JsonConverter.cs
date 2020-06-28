@@ -15,13 +15,6 @@ namespace Compro
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        private static JsonSerializerSettings _usedSettings = DefaultSettings;
-
-        public static void ChangeSettings(JsonSerializerSettings settings)
-        {
-            _usedSettings = settings ?? DefaultSettings;
-        }
-
         public static Try<object?> FromString(string repr, Type targetType)
         {
             if (repr == null) throw new ArgumentNullException(nameof(repr));
@@ -29,17 +22,19 @@ namespace Compro
 
             Result<object?> Try()
             {
-                return JsonConvert.DeserializeObject(repr, targetType, _usedSettings);
+                return JsonConvert.DeserializeObject(repr, targetType, DefaultSettings);
             }
 
             return Try;
         }
 
-        public static Try<string> ToString<T>(T value, bool unescape = true)
+        public static Try<string> ToString<T>(T value,
+                                              JsonSerializerSettings? serializerSettings = null,
+                                              bool unescape = true)
         {
             Result<string> Try()
             {
-                string serialized = JsonConvert.SerializeObject(value, _usedSettings);
+                string serialized = JsonConvert.SerializeObject(value, serializerSettings ?? DefaultSettings);
                 string maybeUnescaped = unescape ? Regex.Unescape(serialized) : serialized;
                 return !(value is null)
                     ? value.GetType().IsPrimitive ? maybeUnescaped.Replace("\"", "") : maybeUnescaped

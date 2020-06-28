@@ -1,6 +1,7 @@
 using System;
 using LanguageExt;
 using LanguageExt.Common;
+using Newtonsoft.Json;
 
 namespace Compro
 {
@@ -16,7 +17,7 @@ namespace Compro
             Exception = e ?? throw new ArgumentNullException(nameof(e));
         }
 
-        public Try<string> Convert(bool unescape = true)
+        public Try<string> Convert(JsonSerializerSettings? serializerSettings = null, bool unescape = true)
         {
             Result<string> Try()
             {

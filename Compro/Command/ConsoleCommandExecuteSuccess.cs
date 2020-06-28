@@ -1,5 +1,6 @@
 using LanguageExt;
 using LanguageExt.Common;
+using Newtonsoft.Json;
 
 namespace Compro
 {
@@ -20,10 +21,10 @@ namespace Compro
             HasValue = true;
         }
 
-        public Try<string> Convert(bool unescape = true)
+        public Try<string> Convert(JsonSerializerSettings? serializerSettings = null, bool unescape = true)
         {
             static Result<string> NoValueRepr() => "";
-            return HasValue ? JsonConverter.ToString(ReturnedValue, unescape) : NoValueRepr;
+            return HasValue ? JsonConverter.ToString(ReturnedValue, serializerSettings, unescape) : NoValueRepr;
         }
 
         private ConsoleCommandExecuteSuccess()
