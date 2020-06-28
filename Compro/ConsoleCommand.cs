@@ -102,7 +102,7 @@ namespace Compro
                 ? new CommandParameterDefault(parameterInfo.DefaultValue)
                 : CommandParameterDefault.None;
             return new CommandParameterInfo(parameterInfo.ParameterType, defaultInfo, parameterInfo.Name ?? "<unknown>",
-                parameterDoc?.Description ?? "");
+                parameterDoc?.Description ?? "", parameterInfo.IsOptional);
         }
 
         private static CommandReturnInfo ExtractResult(MethodInfo executedMethodInfo)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Compro.Extensions;
 using LanguageExt;
 using LanguageExt.Common;
 
@@ -14,12 +15,28 @@ namespace Compro
         /// </summary>
         public ICommandParameterDefault Default { get; }
 
+        /// <inheritdoc />
+        public bool IsOptional { get; }
+
         public CommandParameterInfo(Type type,
                                     CommandParameterDefault defaultValue,
                                     string name = "",
-                                    string description = "")
-            : base(type, name, description) =>
+                                    string description = "",
+                                    bool isOptional = false)
+            : base(type, name, description)
+        {
             Default = defaultValue ?? throw new ArgumentNullException(nameof(defaultValue));
+            IsOptional = isOptional;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var optionalPart = IsOptional ? " [Optional]" : "";
+            return string.IsNullOrWhiteSpace(Description)
+                ? $"{Name}: {Type.UnwrappedName()}{optionalPart}"
+                : $"{Name}: {Type.UnwrappedName()}{optionalPart} — {Description}";
+        }
 
         /// <summary>
         /// Converts given string arguments to their typed version using passed parameter infos as a 'scheme'.

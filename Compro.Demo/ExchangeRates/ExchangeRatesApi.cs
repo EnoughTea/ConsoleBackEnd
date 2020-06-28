@@ -11,8 +11,8 @@ namespace Compro.Demo
     /// <remarks> Courtesy of European Central Bank via https://exchangeratesapi.io/ </remarks>
     public class ExchangeRatesApi
     {
-        private const string BaseDescription = "Currency to quote rates against (optional, \"EUR\" by default).";
-        private const string SymbolsDescription = "Specific currencies to display (optional, shows all by default).";
+        private const string BaseDescription = "Currency to quote rates against (\"EUR\" by default).";
+        private const string SymbolsDescription = "Specific currencies to display (shows all by default).";
 
         private static readonly Uri _Home = new Uri("https://api.exchangeratesapi.io/", UriKind.Absolute);
 
