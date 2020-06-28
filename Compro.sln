@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compro", "Compro\Compro.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compro.Tests", "Compro.Tests\Compro.Tests.csproj", "{5642531E-1DF4-48FA-957D-2CF6B2C01A56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compro.Demo", "Compro.Demo\Compro.Demo.csproj", "{359E5B8A-2CDC-465F-B6FE-A7DC90B80FF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5642531E-1DF4-48FA-957D-2CF6B2C01A56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5642531E-1DF4-48FA-957D-2CF6B2C01A56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5642531E-1DF4-48FA-957D-2CF6B2C01A56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{359E5B8A-2CDC-465F-B6FE-A7DC90B80FF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{359E5B8A-2CDC-465F-B6FE-A7DC90B80FF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{359E5B8A-2CDC-465F-B6FE-A7DC90B80FF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{359E5B8A-2CDC-465F-B6FE-A7DC90B80FF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
