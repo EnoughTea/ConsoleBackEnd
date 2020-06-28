@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using LanguageExt;
 using LanguageExt.Common;
+using static System.Environment;
 
 namespace Compro
 {
@@ -56,6 +57,16 @@ namespace Compro
         {
             return string.Equals(Name, name, StringComparison.OrdinalIgnoreCase) ||
                 Aliases.Exists(alias => string.Equals(alias, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var aliasesPart = string.Join(", ", Aliases);
+            var namePart = string.IsNullOrWhiteSpace(aliasesPart) ? Name : $"{Name} aka {aliasesPart}";
+            var paramsPart = string.Join(NewLine, Parameters);
+            var bracesPart = string.IsNullOrWhiteSpace(paramsPart) ? "()" : $"({NewLine}{paramsPart}{NewLine})";
+            return $"{namePart}{bracesPart}: {Result}";
         }
 
         private Try<object?> Execute(object[] convertedArgs)

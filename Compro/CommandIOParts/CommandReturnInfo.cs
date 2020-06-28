@@ -1,4 +1,5 @@
 using System;
+using Compro.Extensions;
 
 namespace Compro
 {
@@ -6,7 +7,7 @@ namespace Compro
     public class CommandReturnInfo : CommandIOPart, ICommandReturnInfo
     {
         /// <summary>
-        /// Gets the value indicating whether the command returns something or not (returns void).
+        ///     Gets the value indicating whether the command returns something or not (returns void).
         /// </summary>
         public bool HasValue => Type != null && Type != typeof(void);
 
@@ -14,5 +15,11 @@ namespace Compro
                                  string name = "",
                                  string description = "")
             : base(type, name, description) { }
+
+        /// <inheritdoc />
+        public override string ToString() =>
+            string.IsNullOrWhiteSpace(Description)
+                ? $"{Type.UnwrappedName()}"
+                : $"{Type.UnwrappedName()} — {Description}";
     }
 }

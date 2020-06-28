@@ -81,6 +81,10 @@ namespace Compro
         }
 
         /// <inheritdoc />
+        public override string ToString() => string.Join(Environment.NewLine + Environment.NewLine,
+            this.OrderBy(command => command.Name));
+
+        /// <inheritdoc />
         public IEnumerator<IConsoleCommand> GetEnumerator() => _commands.Values.GetEnumerator();
 
         /// <inheritdoc />

@@ -1,4 +1,5 @@
 using System;
+using Compro.Extensions;
 
 namespace Compro
 {
@@ -22,5 +23,11 @@ namespace Compro
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Description = description ?? throw new ArgumentNullException(nameof(description));
         }
+
+        /// <inheritdoc />
+        public override string ToString() =>
+            string.IsNullOrWhiteSpace(Description)
+                ? $"{Name}: {Type.UnwrappedName()}"
+                : $"{Name}: {Type.UnwrappedName()} — {Description}";
     }
 }

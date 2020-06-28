@@ -59,7 +59,7 @@ namespace Compro
 
             return InnerTry;
         }
-        
+
         private static void ConvertAndSetArg(ICommandIOPart currentParamInfo,
                                              string argRepr,
                                              object?[] convertedArgs,
