@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using LanguageExt;
 using LanguageExt.Common;
 using Newtonsoft.Json;
@@ -34,13 +35,14 @@ namespace Compro
             return Try;
         }
 
-        public static Try<string> ToString<T>(T value)
+        public static Try<string> ToString<T>(T value, bool unescape = true)
         {
             Result<string> Try()
             {
                 string serialized = JsonConvert.SerializeObject(value, _usedSettings);
+                string maybeUnescaped = unescape ? Regex.Unescape(serialized) : serialized;
                 return !(value is null)
-                    ? value.GetType().IsPrimitive ? serialized.Replace("\"", "") : serialized
+                    ? value.GetType().IsPrimitive ? maybeUnescaped.Replace("\"", "") : maybeUnescaped
                     : "null";
             }
 

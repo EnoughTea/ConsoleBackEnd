@@ -26,16 +26,21 @@ namespace Compro
 
         public ConsoleCommand(object executedMethodInstance,
                               MethodInfo executedMethodInfo,
-                              string nameOverride = "")
+                              string nameOverride = "",
+                              string? descriptionOverride = null,
+                              IEnumerable<string>? aliasesOverride = null)
         {
             ExecutedMethodInstance = executedMethodInstance;
             ExecutedMethodInfo = executedMethodInfo ?? throw new ArgumentNullException(nameof(executedMethodInfo));
             Name = string.IsNullOrWhiteSpace(nameOverride) ? executedMethodInfo.Name : nameOverride;
-            Description = executedMethodInfo.GetCustomAttribute<CommandExecutableAttribute>()?.Description ?? "";
-            Aliases = executedMethodInfo.GetCustomAttributes<CommandAliasAttribute>()
-                .Select(a => a.Alias)
-                .ToList()
-                .AsReadOnly();
+            Description = descriptionOverride ??
+                (executedMethodInfo.GetCustomAttribute<CommandExecutableAttribute>()?.Description ?? "");
+            Aliases = aliasesOverride == null
+                ? executedMethodInfo.GetCustomAttributes<CommandAliasAttribute>()
+                    .Select(a => a.Alias)
+                    .ToList()
+                    .AsReadOnly()
+                : aliasesOverride.ToList().AsReadOnly();
             Result = ExtractResult(executedMethodInfo);
             Parameters = ExtractParameters(executedMethodInfo);
         }
@@ -62,11 +67,12 @@ namespace Compro
         /// <inheritdoc />
         public override string ToString()
         {
-            var aliasesPart = string.Join(", ", Aliases);
-            var namePart = string.IsNullOrWhiteSpace(aliasesPart) ? Name : $"{Name} aka {aliasesPart}";
-            var paramsPart = string.Join(NewLine, Parameters);
-            var bracesPart = string.IsNullOrWhiteSpace(paramsPart) ? "()" : $"({NewLine}{paramsPart}{NewLine})";
-            return $"{namePart}{bracesPart}: {Result}";
+            string aliasesPart = string.Join(", ", Aliases);
+            string namePart = string.IsNullOrWhiteSpace(aliasesPart) ? Name : $"{Name} aka {aliasesPart}";
+            string paramsPart = string.Join(NewLine, Parameters);
+            string bracesPart = string.IsNullOrWhiteSpace(paramsPart) ? "()" : $"({NewLine}{paramsPart}{NewLine})";
+            string assembled = $"{namePart}{bracesPart}: {Result}";
+            return string.IsNullOrWhiteSpace(Description) ? assembled : $"{assembled} — {Description}";
         }
 
         private Try<object?> Execute(object[] convertedArgs)

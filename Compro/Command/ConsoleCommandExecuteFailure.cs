@@ -16,7 +16,7 @@ namespace Compro
             Exception = e ?? throw new ArgumentNullException(nameof(e));
         }
 
-        public Try<string> Convert()
+        public Try<string> Convert(bool unescape = true)
         {
             Result<string> Try()
             {

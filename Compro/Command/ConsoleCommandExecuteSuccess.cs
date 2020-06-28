@@ -20,10 +20,10 @@ namespace Compro
             HasValue = true;
         }
 
-        public Try<string> Convert()
+        public Try<string> Convert(bool unescape = true)
         {
             static Result<string> NoValueRepr() => "";
-            return HasValue ? JsonConverter.ToString(ReturnedValue) : NoValueRepr;
+            return HasValue ? JsonConverter.ToString(ReturnedValue, unescape) : NoValueRepr;
         }
 
         private ConsoleCommandExecuteSuccess()
