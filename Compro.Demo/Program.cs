@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Compro.Demo
 {
@@ -7,6 +8,8 @@ namespace Compro.Demo
         private static void Main(string[] args)
         {
             var exchangeRatesApi = new ExchangeRatesApi();
+            var jsonSerializerSettings = new JsonSerializerSettings { DateFormatString = "yyyy'-'MM'-'dd" };
+
             var consoleCommands = new ConsoleCommands();
 
             // Methods marked with [CommandExecutable] will be added from the given object instance:
@@ -23,7 +26,7 @@ namespace Compro.Demo
             // Simple REPL:
             while (true) {
                 string commandRepr = Console.ReadLine();
-                string evaluated = consoleCommands.Execute(commandRepr).ConvertOrError();
+                string evaluated = consoleCommands.Execute(commandRepr).ConvertOrError(jsonSerializerSettings);
                 Console.WriteLine(evaluated);
             }
         }

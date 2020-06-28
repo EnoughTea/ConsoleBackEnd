@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using LanguageExt;
 using LanguageExt.Common;
@@ -7,10 +6,9 @@ using Newtonsoft.Json;
 
 namespace Compro
 {
-    public static class JsonConverter
+    internal static class JsonConverter
     {
-        public static JsonSerializerSettings DefaultSettings { get; } = new JsonSerializerSettings {
-            Culture = CultureInfo.InvariantCulture,
+        private static JsonSerializerSettings DeserializationSettings { get; } = new JsonSerializerSettings {
             DateTimeZoneHandling = DateTimeZoneHandling.Utc,
             NullValueHandling = NullValueHandling.Ignore
         };
@@ -22,7 +20,7 @@ namespace Compro
 
             Result<object?> Try()
             {
-                return JsonConvert.DeserializeObject(repr, targetType, DefaultSettings);
+                return JsonConvert.DeserializeObject(repr, targetType, DeserializationSettings);
             }
 
             return Try;
@@ -34,7 +32,7 @@ namespace Compro
         {
             Result<string> Try()
             {
-                string serialized = JsonConvert.SerializeObject(value, serializerSettings ?? DefaultSettings);
+                string serialized = JsonConvert.SerializeObject(value, serializerSettings);
                 string maybeUnescaped = unescape ? Regex.Unescape(serialized) : serialized;
                 return !(value is null)
                     ? value.GetType().IsPrimitive ? maybeUnescaped.Replace("\"", "") : maybeUnescaped

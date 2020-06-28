@@ -17,11 +17,9 @@ namespace Compro.Demo
         public Currency Base { get; set; }
 
         [JsonProperty("start_at")]
-        [JsonConverter(typeof(IsoDateConverter))]
         public DateTime StartAt { get; set; }
 
         [JsonProperty("end_at")]
-        [JsonConverter(typeof(IsoDateConverter))]
         public DateTime EndAt { get; set; }
 
         /// <inheritdoc />
