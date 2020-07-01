@@ -35,7 +35,7 @@ namespace ConsoleBackEnd.Demo
             
             // Simple REPL:
             while (true) {
-                Console.Write($"Command prompt: ");
+                Console.Write("Command prompt: ");
                 string commandRepr = Console.ReadLine();
                 string evaluated = consoleCommands.Execute(commandRepr).ConvertOrError(jsonSerializerSettings);
                 Console.WriteLine(evaluated);
