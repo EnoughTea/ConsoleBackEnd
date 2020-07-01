@@ -2,7 +2,7 @@
 
 namespace ConsoleBackEnd
 {
-    public interface ICommandParameterConverter
+    public interface IConsoleCommandParameterConverter
     {
         /// <summary>
         ///     Converts given string representation of a command parameter to the actual object passed to the command.

@@ -10,14 +10,14 @@ namespace ConsoleBackEnd.Tests
     {
         private TestCommandProvider _commandProvider;
         private ConsoleCommand[] _commands;
-        private ICommandParameterConverter _converter;
+        private IConsoleCommandParameterConverter _converter;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _commandProvider = new TestCommandProvider();
             _commands = ConsoleCommands.GatherFromInstance(_commandProvider);
-            _converter = CommandParameterConverter.Default;
+            _converter = ConsoleCommandParameterConverter.Default;
         }
 
         [Test]

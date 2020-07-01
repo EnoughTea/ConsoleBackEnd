@@ -15,7 +15,7 @@ namespace ConsoleBackEnd
 
         ICommandReturnInfo Result { get; }
 
-        ICommandExecuteResult Execute(ICommandParameterConverter argConverter, params string[] args);
+        ICommandExecuteResult Execute(IConsoleCommandParameterConverter argConverter, params string[] args);
 
         bool CanBeCalledBy(string name);
     }

@@ -5,14 +5,14 @@ using Newtonsoft.Json;
 namespace ConsoleBackEnd
 {
     /// <summary> Converts command parameters using JSON. </summary>
-    public class CommandParameterConverter : ICommandParameterConverter
+    public class ConsoleCommandParameterConverter : IConsoleCommandParameterConverter
     {
         private readonly JsonSerializerSettings? _serializerSettings;
-        public static CommandParameterConverter Default { get; } = new CommandParameterConverter();
+        public static ConsoleCommandParameterConverter Default { get; } = new ConsoleCommandParameterConverter();
 
-        public CommandParameterConverter() { }
+        public ConsoleCommandParameterConverter() { }
 
-        public CommandParameterConverter(JsonSerializerSettings serializerSettings)
+        public ConsoleCommandParameterConverter(JsonSerializerSettings serializerSettings)
             : this() =>
             _serializerSettings = serializerSettings ?? throw new ArgumentNullException(nameof(serializerSettings));
 

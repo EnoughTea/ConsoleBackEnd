@@ -55,7 +55,7 @@ namespace ConsoleBackEnd
         /// <exception cref="ArgumentException">Not enough arguments for passed parameter infos.</exception>
         internal static Try<object?[]> ConvertArgs(IReadOnlyList<CommandParameterInfo> parameterInfos,
                                                    string[] args,
-                                                   ICommandParameterConverter parameterConverter)
+                                                   IConsoleCommandParameterConverter parameterConverter)
         {
             if (args.Length > parameterInfos.Count) {
                 return Fail<object?[]>(new ArgumentException($"Passed {args.Length} argument(s), but there are " +

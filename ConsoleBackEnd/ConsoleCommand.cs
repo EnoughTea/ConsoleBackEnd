@@ -45,7 +45,7 @@ namespace ConsoleBackEnd
             Parameters = ExtractParameters(executedMethodInfo);
         }
 
-        public ICommandExecuteResult Execute(ICommandParameterConverter argConverter, params string[] args)
+        public ICommandExecuteResult Execute(IConsoleCommandParameterConverter argConverter, params string[] args)
         {
             var result = from convertedArgs in CommandParameterInfo.ConvertArgs(Parameters, args, argConverter)
                          from returned in Execute(convertedArgs)
@@ -68,11 +68,15 @@ namespace ConsoleBackEnd
         public override string ToString()
         {
             string aliasesPart = string.Join(", ", Aliases);
-            string namePart = string.IsNullOrWhiteSpace(aliasesPart) ? Name : $"{Name} aka {aliasesPart}";
-            string paramsPart = string.Join(NewLine, Parameters);
-            string bracesPart = string.IsNullOrWhiteSpace(paramsPart) ? "()" : $"({NewLine}{paramsPart}{NewLine})";
-            string assembled = $"{namePart}{bracesPart}: {Result}";
-            return string.IsNullOrWhiteSpace(Description) ? assembled : $"{assembled} — {Description}";
+            string descriptionPart = !string.IsNullOrWhiteSpace(Description) ? $"{Description}" : "";
+            string namePart =  !string.IsNullOrWhiteSpace(aliasesPart) ? $"{Name} aka {aliasesPart}{NewLine}" : Name;
+            string paramsPart = string.Join(NewLine, Parameters.Select(p => $"    {p}"));
+            string bracesPart = !string.IsNullOrWhiteSpace(paramsPart)
+                ? $"{NewLine}Parameters: ({NewLine}{paramsPart}{NewLine})"
+                : "";
+            string resultPart = Result.Type != typeof(void) ? $"{NewLine}Returns: {Result}" : "";
+            string assembled = $"{namePart}{descriptionPart}{bracesPart}{resultPart}";
+            return assembled;
         }
 
         private Try<object?> Execute(object[] convertedArgs)

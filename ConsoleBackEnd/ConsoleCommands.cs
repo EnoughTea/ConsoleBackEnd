@@ -14,17 +14,18 @@ namespace ConsoleBackEnd
         private readonly ConcurrentDictionary<string, IConsoleCommand> _commands =
             new ConcurrentDictionary<string, IConsoleCommand>(StringComparer.OrdinalIgnoreCase);
 
-        private readonly ICommandParameterConverter _parameterConverter;
+        private readonly IConsoleCommandParameterConverter _parameterConverter;
 
         private readonly IConsoleCommandParser _parser;
 
         /// <summary> Uses default console command parser. </summary>
-        public ConsoleCommands() : this(ConsoleCommandParser.Default, CommandParameterConverter.Default) { }
+        public ConsoleCommands() : this(ConsoleCommandParser.Default, ConsoleCommandParameterConverter.Default) { }
 
         public ConsoleCommands(IConsoleCommandParser commandParser)
-            : this(commandParser, CommandParameterConverter.Default) { }
+            : this(commandParser, ConsoleCommandParameterConverter.Default) { }
 
-        public ConsoleCommands(IConsoleCommandParser commandParser, ICommandParameterConverter parameterConverter)
+        public ConsoleCommands(IConsoleCommandParser commandParser,
+                               IConsoleCommandParameterConverter parameterConverter)
         {
             _parser = commandParser ?? throw new ArgumentNullException(nameof(commandParser));
             _parameterConverter = parameterConverter ?? throw new ArgumentNullException(nameof(parameterConverter));
