@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace ConsoleBackEnd.Tests
@@ -77,9 +78,9 @@ namespace ConsoleBackEnd.Tests
             var failure = result as ConsoleCommandExecuteFailure;
 
             Assert.NotNull(failure);
-            Assert.That(failure.Exception is ArgumentException);
+            Assert.That(failure.Exception is JsonException);
             string converted = result.ConvertOrError();
-            Assert.That(converted.StartsWith("System.ArgumentException: Could not convert string to double"));
+            Assert.That(converted.StartsWith("Newtonsoft.Json.JsonReaderException: Could not convert string to double: not a float."));
         }
 
         [Test]
