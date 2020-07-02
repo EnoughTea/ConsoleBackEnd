@@ -23,10 +23,10 @@ namespace ConsoleBackEnd
 
         private ConsoleCommandExecuteSuccess() => ReturnedValue = typeof(void);
 
-        public Try<string> Convert(JsonSerializerSettings? serializerSettings = null, bool unescape = true)
+        public Try<string> Convert(ICommandReturnedObjectConverter resultConverter)
         {
             static Result<string> NoValueRepr() => "";
-            return HasValue ? JsonConverter.ToString(ReturnedValue, serializerSettings, unescape) : NoValueRepr;
+            return HasValue ? resultConverter.Convert(ReturnedValue) : NoValueRepr;
         }
     }
 }

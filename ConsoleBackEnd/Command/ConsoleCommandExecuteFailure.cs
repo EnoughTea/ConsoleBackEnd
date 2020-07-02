@@ -14,7 +14,7 @@ namespace ConsoleBackEnd
 
         public ConsoleCommandExecuteFailure(Exception e) => Exception = e ?? throw new ArgumentNullException(nameof(e));
 
-        public Try<string> Convert(JsonSerializerSettings? serializerSettings = null, bool unescape = true) =>
+        public Try<string> Convert(ICommandReturnedObjectConverter resultConverter) =>
             Fail<string>(Exception);
     }
 }

@@ -27,7 +27,7 @@ namespace ConsoleBackEnd.Tests
         {
             string nan = JsonConverter.ToString(float.NaN).IfFail(e => e.Message);
 
-            Assert.AreEqual("NaN", nan);
+            Assert.AreEqual("\"NaN\"", nan);
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace ConsoleBackEnd.Tests
         {
             string negInf = JsonConverter.ToString(float.NegativeInfinity).IfFail(e => e.Message);
 
-            Assert.AreEqual("-Infinity", negInf);
+            Assert.AreEqual("\"-Infinity\"", negInf);
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace ConsoleBackEnd.Tests
         {
             string posInf = JsonConverter.ToString(float.PositiveInfinity).IfFail(e => e.Message);
 
-            Assert.AreEqual("Infinity", posInf);
+            Assert.AreEqual("\"Infinity\"", posInf);
         }
 
         [Test]
@@ -80,7 +80,16 @@ namespace ConsoleBackEnd.Tests
             string degree = JsonConverter.ToString('\u00f8')
                 .IfFail(e => e.Message);
 
-            Assert.AreEqual("\u00f8", degree);
+            Assert.AreEqual("\"\u00f8\"", degree);
+        }
+        
+        [Test]
+        public void EmptyStringShouldBeConverted()
+        {
+            string empty = JsonConverter.ToString("")
+                .IfFail(e => e.Message);
+
+            Assert.AreEqual("\"\"", empty);
         }
 
         [Test]

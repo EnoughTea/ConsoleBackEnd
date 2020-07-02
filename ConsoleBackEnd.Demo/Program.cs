@@ -7,12 +7,18 @@ namespace ConsoleBackEnd.Demo
     {
         private static void Main(string[] args)
         {
+            // Create instance containing several commands which call ExchangeRates API synchronously.
             var exchangeRatesApi = new ExchangeRatesApi();
-            var jsonSerializerSettings = new JsonSerializerSettings { DateFormatString = "yyyy'-'MM'-'dd" };
-
+            
+            // Slightly customize 'command result to string' converter,
+            // since ExchangeRates returns ISO dates without time part.
+            var returnConverter = new CommandReturnedObjectJsonConverter(true, Formatting.Indented,
+                new JsonSerializerSettings { DateFormatString = "yyyy'-'MM'-'dd" });
+            
+            // Create command manager.
             var consoleCommands = new ConsoleCommands();
 
-            // Methods marked with [CommandExecutable] will be added from the given object instance:
+            // Methods marked with [CommandExecutable] will be added from the given instance:
             consoleCommands.RegisterAllFromInstance(exchangeRatesApi);
 
             // Example of manually created commands:
@@ -37,7 +43,7 @@ namespace ConsoleBackEnd.Demo
             while (true) {
                 Console.Write("Command prompt: ");
                 string commandRepr = Console.ReadLine();
-                string evaluated = consoleCommands.Execute(commandRepr).ConvertOrError(jsonSerializerSettings);
+                string evaluated = consoleCommands.Execute(commandRepr).ConvertOrError();
                 Console.WriteLine(evaluated);
             }
         }

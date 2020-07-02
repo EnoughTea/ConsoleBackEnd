@@ -1,5 +1,4 @@
 using LanguageExt;
-using Newtonsoft.Json;
 
 namespace ConsoleBackEnd
 {
@@ -10,20 +9,31 @@ namespace ConsoleBackEnd
         bool IsSuccess { get; }
 
         /// <summary>
-        ///     Converts object returned by a successfully executed command to string with the help of a json serializer.
+        ///     Converts object returned by a successfully executed command to string with the help of a given converter.
         /// </summary>
-        /// <param name="serializerSettings">JSON serializer settings.</param>
-        /// <param name="unescape">If true, returned string will be unescaped.</param>
+        /// <param name="resultConverter">Converter used to convert command result to a string.</param>
         /// <returns>String representation of the command return value.</returns>
-        Try<string> Convert(JsonSerializerSettings? serializerSettings = null, bool unescape = true);
+        Try<string> Convert(ICommandReturnedObjectConverter resultConverter);
 
         /// <summary>
         ///     Converts object returned by a successfully executed command to string with the help of a json serializer.
         /// </summary>
-        /// <param name="serializerSettings">JSON serializer settings.</param>
-        /// <param name="unescape">If true, returned string will be unescaped.</param>
+        /// <param name="resultConverter">Converter used to convert command result to a string.</param>
+        /// <returns>String representation of the command return value.</returns>
+        Try<string> Convert() => Convert(CommandReturnedObjectJsonConverter.Default);
+
+        /// <summary>
+        ///     Converts object returned by a successfully executed command to string with the help of a given converter.
+        /// </summary>
+        /// <param name="resultConverter">Converter used to convert command result to a string.</param>
         /// <returns>String representation of either the command return value or command execution error.</returns>
-        string ConvertOrError(JsonSerializerSettings? serializerSettings = null, bool unescape = true) =>
-            Convert(serializerSettings, unescape).IfFail(e => e.ToString());
+        string ConvertOrError(ICommandReturnedObjectConverter resultConverter) =>
+            Convert(resultConverter).IfFail(e => e.ToString());
+
+        /// <summary>
+        ///     Converts object returned by a successfully executed command to string with the help of a json serializer.
+        /// </summary>
+        /// <returns>String representation of either the command return value or command execution error.</returns>
+        string ConvertOrError() => ConvertOrError(CommandReturnedObjectJsonConverter.Default);
     }
 }

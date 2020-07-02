@@ -28,16 +28,17 @@ namespace ConsoleBackEnd
         }
 
         public static Try<string> ToString<T>(T value,
-                                              JsonSerializerSettings? serializerSettings = null,
-                                              bool unescape = true)
+                                              bool unescape = true,
+                                              Formatting formatting = Formatting.Indented,
+                                              JsonSerializerSettings? serializerSettings = null)
         {
             Result<string> Try()
             {
-                string serialized = JsonConvert.SerializeObject(value, serializerSettings);
+                if (value is null) return "null";
+                
+                string serialized = JsonConvert.SerializeObject(value, formatting, serializerSettings);
                 string maybeUnescaped = unescape ? Regex.Unescape(serialized) : serialized;
-                return !(value is null)
-                    ? value.GetType().IsPrimitive ? maybeUnescaped.Replace("\"", "") : maybeUnescaped
-                    : "null";
+                return maybeUnescaped;
             }
 
             return Try;
