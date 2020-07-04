@@ -40,7 +40,7 @@ namespace ConsoleBackEnd
         /// <summary>
         ///     Converts given string arguments to their typed version using passed parameter infos as a 'scheme'.
         /// </summary>
-        /// <param name="parameterInfos">Parameter infos serving as a 'scheme' for args.</param>
+        /// <param name="command">Command, whose parameter infos serve as a 'scheme' for args.</param>
         /// <param name="args">Args to map onto passed parameter infos.</param>
         /// <param name="parameterConverter">
         ///     Parameter converter used to convert string representation
@@ -51,15 +51,16 @@ namespace ConsoleBackEnd
         ///     so do not forget to return it there when you're done with it.
         /// </returns>
         /// <exception cref="ArgumentException">Not enough arguments for passed parameter infos.</exception>
-        internal static Try<object?[]> ConvertArgs(IReadOnlyList<CommandParameterInfo> parameterInfos,
+        internal static Try<object?[]> ConvertArgs(IConsoleCommand command,
                                                    string[] args,
                                                    IConsoleCommandParameterConverter parameterConverter)
         {
             object?[] Convert()
             {
+                var parameterInfos = command.Parameters;
                 if (args.Length > parameterInfos.Count) {
                     throw new ArgumentException($"Passed {args.Length} argument(s), but there are " +
-                        $"${parameterInfos.Count} command parameters.");
+                        $"{parameterInfos.Count} command parameters.");
                 }
 
                 // Request array will be returned in ConsoleCommand.Execute()
@@ -75,7 +76,8 @@ namespace ConsoleBackEnd
                         if (currentParamInfo.Default.HasDefault) {
                             convertedArgs[index] = currentParamInfo.Default.Value;
                         } else {
-                            throw new ArgumentException($"Passed {args.Length} argument(s), but it was not enough.");
+                            throw new ArgumentException($"Passed {args.Length} argument(s), but it was not enough for " +
+                                $"a '{command.Name}' command with {parameterInfos.Count} parameters.");
                         }
                     }
                 }

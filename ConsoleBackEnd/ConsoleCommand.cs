@@ -46,7 +46,7 @@ namespace ConsoleBackEnd
 
         public ICommandExecuteResult Execute(IConsoleCommandParameterConverter argConverter, params string[] args)
         {
-            var result = from convertedArgs in CommandParameterInfo.ConvertArgs(Parameters, args, argConverter)
+            var result = from convertedArgs in CommandParameterInfo.ConvertArgs(this, args, argConverter)
                          from returned in Execute(convertedArgs)
                          select returned;
             return result.Try().Match<ICommandExecuteResult>(
