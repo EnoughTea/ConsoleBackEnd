@@ -80,8 +80,35 @@ namespace ConsoleBackEnd.Tests
             Assert.NotNull(failure);
             Assert.That(failure.Exception is JsonException);
             string converted = result.ConvertOrError();
-            Assert.That(converted.StartsWith(
-                "Newtonsoft.Json.JsonReaderException: Could not convert string to double: not a float."));
+            Assert.That(converted.StartsWith("Could not convert string to double: not a float."));
+        }
+        
+        [Test]
+        public void CommandShouldReturnExceptionStringOnNotEnoughArgs()
+        {
+            var sqrtCommand = _commands.First(c => c.Name == "Sqrt");
+
+            var result = sqrtCommand.Execute(_converter);
+            var failure = result as ConsoleCommandExecuteFailure;
+
+            Assert.NotNull(failure);
+            string converted = result.ConvertOrError();
+            Assert.AreEqual("Passed 0 argument(s), but it was not enough for a 'Sqrt' command with 1 parameters.",
+                converted);
+        }
+        
+        [Test]
+        public void CommandShouldReturnExceptionStringOnTooManyArgs()
+        {
+            var sqrtCommand = _commands.First(c => c.Name == "Sqrt");
+
+            var result = sqrtCommand.Execute(_converter, "4", "9", "16");
+            var failure = result as ConsoleCommandExecuteFailure;
+
+            Assert.NotNull(failure);
+            string converted = result.ConvertOrError();
+            Assert.AreEqual("Passed 3 argument(s), but command 'Sqrt' has 1 command parameter(s).",
+                converted);
         }
 
         [Test]

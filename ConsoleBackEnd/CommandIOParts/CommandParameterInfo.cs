@@ -59,8 +59,8 @@ namespace ConsoleBackEnd
             {
                 var parameterInfos = command.Parameters;
                 if (args.Length > parameterInfos.Count) {
-                    throw new ArgumentException($"Passed {args.Length} argument(s), but there are " +
-                        $"{parameterInfos.Count} command parameters.");
+                    throw new ArgumentException($"Passed {args.Length} argument(s), but command '{command.Name}' " +
+                        $"has {parameterInfos.Count} command parameter(s).");
                 }
 
                 // Request array will be returned in ConsoleCommand.Execute()

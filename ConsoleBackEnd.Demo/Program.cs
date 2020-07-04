@@ -8,7 +8,8 @@ namespace ConsoleBackEnd.Demo
         private static void Main(string[] args)
         {
             // For this demo I've written ExchangeRatesApi class, which provides several methods
-            // representing requests to https://exchangeratesapi.io/. These return various forex currency rates.
+            // representing requests to https://exchangeratesapi.io/.
+            // These return various forex currency rates at the given day.
             // So let's allow user to call them from console via text input,
             // passing function parameters as JSON objects:
 
