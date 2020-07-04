@@ -80,7 +80,8 @@ namespace ConsoleBackEnd.Tests
             Assert.NotNull(failure);
             Assert.That(failure.Exception is JsonException);
             string converted = result.ConvertOrError();
-            Assert.That(converted.StartsWith("Newtonsoft.Json.JsonReaderException: Could not convert string to double: not a float."));
+            Assert.That(converted.StartsWith(
+                "Newtonsoft.Json.JsonReaderException: Could not convert string to double: not a float."));
         }
 
         [Test]

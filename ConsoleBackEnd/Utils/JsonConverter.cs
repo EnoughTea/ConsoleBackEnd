@@ -1,7 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
 using LanguageExt;
-using LanguageExt.Common;
 using Newtonsoft.Json;
 using static ConsoleBackEnd.TryHelper;
 
@@ -21,10 +20,10 @@ namespace ConsoleBackEnd
             if (repr == null) return FailNull<object?>(nameof(repr));
             if (targetType == null) return FailNull<object?>(nameof(targetType));
 
-            Result<object?> Try() =>
+            object? Deserialize() =>
                 JsonConvert.DeserializeObject(repr, targetType, serializerSettings ?? DeserializationSettings);
 
-            return Try;
+            return () => Deserialize();
         }
 
         public static Try<string> ToString<T>(T value,
@@ -32,16 +31,16 @@ namespace ConsoleBackEnd
                                               Formatting formatting = Formatting.Indented,
                                               JsonSerializerSettings? serializerSettings = null)
         {
-            Result<string> Try()
+            string Serialize()
             {
                 if (value is null) return "null";
-                
+
                 string serialized = JsonConvert.SerializeObject(value, formatting, serializerSettings);
                 string maybeUnescaped = unescape ? Regex.Unescape(serialized) : serialized;
                 return maybeUnescaped;
             }
 
-            return Try;
+            return () => Serialize();
         }
     }
 }

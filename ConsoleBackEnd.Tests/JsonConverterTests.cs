@@ -82,7 +82,7 @@ namespace ConsoleBackEnd.Tests
 
             Assert.AreEqual("\"\u00f8\"", degree);
         }
-        
+
         [Test]
         public void EmptyStringShouldBeConverted()
         {

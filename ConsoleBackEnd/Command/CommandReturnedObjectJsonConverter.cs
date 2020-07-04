@@ -1,7 +1,7 @@
 ﻿using LanguageExt;
 using Newtonsoft.Json;
 
-namespace ConsoleBackEnd 
+namespace ConsoleBackEnd
 {
     public class CommandReturnedObjectJsonConverter : ICommandReturnedObjectConverter
     {
@@ -15,8 +15,8 @@ namespace ConsoleBackEnd
         public JsonSerializerSettings? SerializerSettings { get; }
 
         public CommandReturnedObjectJsonConverter(bool unescape = true,
-                                                 Formatting formatting = Formatting.Indented,
-                                                 JsonSerializerSettings? serializerSettings = null)
+                                                  Formatting formatting = Formatting.Indented,
+                                                  JsonSerializerSettings? serializerSettings = null)
         {
             Unescape = unescape;
             Formatting = formatting;

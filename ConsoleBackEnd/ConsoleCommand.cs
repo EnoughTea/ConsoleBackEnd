@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using LanguageExt;
-using LanguageExt.Common;
 using static System.Environment;
 
 namespace ConsoleBackEnd
@@ -69,7 +68,7 @@ namespace ConsoleBackEnd
         {
             string aliasesPart = string.Join(", ", Aliases);
             string descriptionPart = !string.IsNullOrWhiteSpace(Description) ? $"{Description}" : "";
-            string namePart =  !string.IsNullOrWhiteSpace(aliasesPart) ? $"{Name} aka {aliasesPart}{NewLine}" : Name;
+            string namePart = !string.IsNullOrWhiteSpace(aliasesPart) ? $"{Name} aka {aliasesPart}{NewLine}" : Name;
             string paramsPart = string.Join(NewLine, Parameters.Select(p => $"    {p}"));
             string bracesPart = !string.IsNullOrWhiteSpace(paramsPart)
                 ? $"{NewLine}Parameters: ({NewLine}{paramsPart}{NewLine})"
@@ -81,14 +80,11 @@ namespace ConsoleBackEnd
 
         private Try<object?> Execute(object[] convertedArgs)
         {
-            Result<object?> Try()
-            {
+            return () => {
                 var result = ExecutedMethodInfo.Invoke(ExecutedMethodInstance, convertedArgs);
-                ArrayPools<object?>.Return(convertedArgs);
+                ArrayPools<object?>.Return(convertedArgs); // convertedArgs was previously requested in ConvertArgs()
                 return result;
-            }
-
-            return Try;
+            };
         }
 
         private static IReadOnlyList<CommandParameterInfo> ExtractParameters(MethodInfo executedMethodInfo)

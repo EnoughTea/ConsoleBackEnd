@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using ConsoleBackEnd.Extensions;
 using LanguageExt;
-using LanguageExt.Common;
-using static ConsoleBackEnd.TryHelper;
 
 namespace ConsoleBackEnd
 {
@@ -57,33 +55,35 @@ namespace ConsoleBackEnd
                                                    string[] args,
                                                    IConsoleCommandParameterConverter parameterConverter)
         {
-            if (args.Length > parameterInfos.Count) {
-                return Fail<object?[]>(new ArgumentException($"Passed {args.Length} argument(s), but there are " +
-                    $"${parameterInfos.Count} command parameters."));
-            }
+            object?[] Convert()
+            {
+                if (args.Length > parameterInfos.Count) {
+                    throw new ArgumentException($"Passed {args.Length} argument(s), but there are " +
+                        $"${parameterInfos.Count} command parameters.");
+                }
 
-            var convertedArgs = ArrayPools<object?>.Request(parameterInfos.Count);
-            for (int index = 0; index < parameterInfos.Count; index++) {
-                var currentParamInfo = parameterInfos[index];
-                if (args.Length > index) {
-                    string arg = args[index];
-                    var conversionResult = parameterConverter.Convert(currentParamInfo, arg);
-                    Exception? failure = null;
-                    conversionResult.Match(convertedArg => convertedArgs[index] = convertedArg,
-                        e => failure = e);
-                    if (failure != null) return Fail<object?[]>(failure);
-                } else {
-                    if (currentParamInfo.Default.HasDefault) {
-                        convertedArgs[index] = currentParamInfo.Default.Value;
+                // Request array will be returned in ConsoleCommand.Execute()
+                var convertedArgs = ArrayPools<object?>.Request(parameterInfos.Count);
+                for (int index = 0; index < parameterInfos.Count; index++) {
+                    var currentParamInfo = parameterInfos[index];
+                    if (args.Length > index) {
+                        int currentIndex = index;
+                        var conversionResult = parameterConverter.Convert(currentParamInfo, args[currentIndex]);
+                        conversionResult.Match(convertedArg => convertedArgs[currentIndex] = convertedArg,
+                            e => throw e);
                     } else {
-                        return Fail<object?[]>(new ArgumentException(
-                            $"Passed {args.Length} argument(s), but it was not enough."));
+                        if (currentParamInfo.Default.HasDefault) {
+                            convertedArgs[index] = currentParamInfo.Default.Value;
+                        } else {
+                            throw new ArgumentException($"Passed {args.Length} argument(s), but it was not enough.");
+                        }
                     }
                 }
+
+                return convertedArgs;
             }
 
-            Result<object?[]> InnerTry() => convertedArgs;
-            return InnerTry;
+            return () => Convert();
         }
     }
 }

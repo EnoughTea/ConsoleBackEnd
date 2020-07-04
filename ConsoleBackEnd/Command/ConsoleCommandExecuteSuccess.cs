@@ -1,6 +1,5 @@
 using LanguageExt;
 using LanguageExt.Common;
-using Newtonsoft.Json;
 
 namespace ConsoleBackEnd
 {
