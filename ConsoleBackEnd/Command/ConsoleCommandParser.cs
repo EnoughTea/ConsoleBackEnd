@@ -5,6 +5,10 @@ using Newtonsoft.Json.Linq;
 
 namespace ConsoleBackEnd
 {
+    /// <summary>
+    /// Parses given user input containing a command like "CommandName(param1Json, paramNJson)"
+    /// into a command name with array of args.
+    /// </summary>
     public class ConsoleCommandParser : IConsoleCommandParser
     {
         public static ConsoleCommandParser Default { get; } = new ConsoleCommandParser();
@@ -26,7 +30,13 @@ namespace ConsoleBackEnd
                 return new ConsoleCommandParseSuccess(commandName);
             }
 
-            var jsonArgs = JArray.Parse("[" + parametersPart + "]");
+            JArray jsonArgs;
+            try {
+                jsonArgs = JArray.Parse("[" + parametersPart + "]");
+            } catch (Exception e) {
+                return new ConsoleCommandParseFailure(e);
+            }
+            
             var args = jsonArgs.Select(element => element.ToString(Formatting.None)).ToArray();
             return new ConsoleCommandParseSuccess(commandName, args);
         }
