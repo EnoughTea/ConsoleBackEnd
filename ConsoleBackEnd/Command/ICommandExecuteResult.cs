@@ -28,7 +28,7 @@ namespace ConsoleBackEnd
         /// <param name="resultConverter">Converter used to convert command result to a string.</param>
         /// <returns>String representation of either the command return value or command execution error.</returns>
         string ConvertOrError(ICommandReturnedObjectConverter resultConverter) =>
-            Convert(resultConverter).IfFail(e => e.ToString());
+            Convert(resultConverter).IfFail(e => resultConverter.PrintErrorStackTrace ? e.ToString() : e.Message);
 
         /// <summary>
         ///     Converts object returned by a successfully executed command to string with the help of a json serializer.

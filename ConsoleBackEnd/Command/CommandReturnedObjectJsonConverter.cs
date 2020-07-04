@@ -24,6 +24,9 @@ namespace ConsoleBackEnd
         }
 
         /// <inheritdoc />
+        public bool PrintErrorStackTrace { get; set; }
+
+        /// <inheritdoc />
         public Try<string> Convert(object? commandReturnedObject) =>
             JsonConverter.ToString(commandReturnedObject, Unescape, Formatting, SerializerSettings);
     }
