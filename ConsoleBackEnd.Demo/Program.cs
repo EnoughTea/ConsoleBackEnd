@@ -16,7 +16,7 @@ namespace ConsoleBackEnd.Demo
             // First, create instance containing several commands which call ExchangeRates API synchronously.
             var exchangeRatesApi = new ExchangeRatesApi();
 
-            // Slightly customize 'command result to string' converter,
+            // Customize 'command result to string' converter a bit for better output printing,
             // since exchangeratesapi.io returns ISO dates without time part.
             var commandReturnsConverter = new CommandReturnedObjectJsonConverter(true, Formatting.Indented,
                 new JsonSerializerSettings { DateFormatString = "yyyy'-'MM'-'dd" });
@@ -24,7 +24,9 @@ namespace ConsoleBackEnd.Demo
             // Create command manager. It will contain a set of commands, parse given user input into a proper command,
             // convert its parameters from a string to typed objects, execute the command with converted parameters
             // and return a result.
-            var consoleCommands = new ConsoleCommands();
+            var consoleCommands = new ConsoleCommands(ConsoleCommandParser.Default,
+                ConsoleCommandParameterConverter.Default);
+            // Argument JSON handling can be customized by passing 'new ConsoleCommandParameterConverter(yourJsonDeserializerSettings)' here.
 
             // Methods marked with [CommandExecutable] will be added from the given exchangeRatesApi instance:
             consoleCommands.RegisterAllFromInstance(exchangeRatesApi);
@@ -44,7 +46,7 @@ namespace ConsoleBackEnd.Demo
             var quit = new Action(() => Environment.Exit(0));
             consoleCommands.Register(new ConsoleCommand(quit.Target!, quit.Method, "quit",
                 "Quits the program.", new[] { "q" }));
-
+            
             Console.WriteLine("Input \"help\" without quotes to see available commands. Pass command parameters as " +
                 "JSON, for example: d(\"2019-12-31\", \"USD\", [\"EUR\", \"RUB\"])");
 
