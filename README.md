@@ -1,6 +1,6 @@
 # Simple game console back-end
 
-This thing parses a command from user input, which should look like `commandNameOrAlias(param1Json, paramNJson)`.
+This thing parses a command from user input, which should look like `commandNameOrAlias(param1Json, paramNJson)`, e.g. `sum(2, 2)`.
 Then parsed command is executed and either a command result or an exception message is returned.  
 
 Commands are strongly typed with tons of metadata available.
